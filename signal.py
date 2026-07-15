@@ -1,27 +1,88 @@
-def judge(data):
-
-    score = 0
+def score_market(data):
+    
+    score = 50
     reasons = []
 
-    if data["ma25"] > data["ma75"]:
-        score += 2
-        reasons.append("25日線が75日線を上回っています")
+    # QQQ
+    if data["change"] > 1:
+        score += 15
+        reasons.append("QQQが1%以上上昇しています")
 
-    if data["price"] > data["ma25"]:
-        score += 1
-        reasons.append("価格は25日線より上です")
+    elif data["change"] < -1:
+        score -= 15
+        reasons.append("QQQが1%以上下落しています")
 
-    if data["vix"] < 20:
-        score += 1
-        reasons.append("VIXが20以下です")
+    # S&P500
+    if data["spy_change"] > 0.5:
+        score += 10
+        reasons.append("S&P500が堅調です")
 
-    stars = "★" * min(score + 1, 5) + "☆" * (5 - min(score + 1, 5))
+    elif data["spy_change"] < -0.5:
+        score -= 10
+        reasons.append("S&P500が弱い動きです")
 
-    if score >= 4:
-        action = "PayPayポイントを追加"
-    elif score >= 2:
-        action = "保有を継続"
-    else:
-        action = "様子見"
+    # VIX
+    if data["vix"] < 18:
+        score += 10
+        reasons.append("VIXが低く市場心理は良好です")
 
-    return stars, reasons, action
+    elif data["vix"] > 25:
+        score -= 20
+        reasons.append("VIXが高く警戒が必要です")
+
+    score = max(0, min(score, 100))
+
+    return score, reasons
+
+
+def recommend_courses(data, market_score):
+    
+    courses = {
+        "テクノロジーチャレンジ": 80,
+        "テクノロジー": 80,
+        "チャレンジ": 80,
+        "スタンダード": 80,
+        "ゴールド": 80,
+        "アメリカ長期国債チャレンジ": 80,
+        "逆チャレンジ": 80,
+    }
+
+    # 市場スコア
+    if market_score >= 80:
+        courses["テクノロジーチャレンジ"] += 10
+        courses["テクノロジー"] += 8
+        courses["チャレンジ"] += 5
+
+    elif market_score <= 40:
+        courses["ゴールド"] += 12
+        courses["アメリカ長期国債チャレンジ"] += 10
+        courses["逆チャレンジ"] += 8
+
+    # NASDAQ(QQQ)
+    if data["change"] > 1:
+        courses["テクノロジーチャレンジ"] += 8
+        courses["テクノロジー"] += 6
+
+    elif data["change"] < -1:
+        courses["逆チャレンジ"] += 8
+
+    # S&P500
+    if data["spy_change"] > 0:
+        courses["スタンダード"] += 5
+        courses["チャレンジ"] += 3
+
+    # VIX
+    if data["vix"] < 18:
+        courses["テクノロジーチャレンジ"] += 5
+
+    elif data["vix"] > 25:
+        courses["ゴールド"] += 10
+        courses["アメリカ長期国債チャレンジ"] += 8
+
+    ranking = sorted(
+        courses.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    return ranking

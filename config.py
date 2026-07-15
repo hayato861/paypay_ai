@@ -1,2 +1,11 @@
+OPENAI_API_KEY = ""
+
 LINE_CHANNEL_ACCESS_TOKEN = ""
-LINE_USER_ID = ""
+
+try:
+
+    from config_local import *
+
+except ImportError:
+
+    pass
