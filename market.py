@@ -1,12 +1,22 @@
 import yfinance as yf
 
+TICKERS = {
+    "QQQ": "QQQ",
+    "SPY": "SPY",
+    "VIX": "^VIX",
+    "GLD": "GLD",
+    "TNX": "^TNX",
+    "USDJPY": "JPY=X",
+}
+
+
 def get_market_data():
-    qqq = yf.Ticker("QQQ")
-    spy = yf.Ticker("SPY")
-    vix = yf.Ticker("^VIX")
-    gold = yf.Ticker("GLD")
-    tnx = yf.Ticker("^TNX")
-    usdjpy = yf.Ticker("JPY=X")
+    qqq = yf.Ticker(TICKERS["QQQ"])
+    spy = yf.Ticker(TICKERS["SPY"])
+    vix = yf.Ticker(TICKERS["VIX"])
+    gold = yf.Ticker(TICKERS["GLD"])
+    tnx = yf.Ticker(TICKERS["TNX"])
+    usdjpy = yf.Ticker(TICKERS["USDJPY"])
 
     qqq_hist = qqq.history(period="120d")
     spy_hist = spy.history(period="5d")

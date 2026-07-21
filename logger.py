@@ -1,9 +1,9 @@
-import logging
+from datetime import datetime
 
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s"
-)
+def log(message):
 
-logger = logging.getLogger(__name__)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open("logs/system.log","a",encoding="utf-8") as f:
+
+        f.write(f"{now} {message}\n")

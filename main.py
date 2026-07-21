@@ -2,6 +2,9 @@ from market import get_market_data
 from signal import score_market, recommend_courses
 from report import create_report
 from notify import notify
+from publisher import publish
+
+
 
 # 市場データ取得
 data = get_market_data()
@@ -27,4 +30,4 @@ text = create_report(
 
 print(text)
 
-notify(text)
+publish(text)
