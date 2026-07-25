@@ -1,37 +1,33 @@
 import csv
-import os
+from pathlib import Path
 from datetime import datetime
 
-CSV_FILE = "data/history.csv"
 
+def save_history(score, recommend):
 
-def save_history(data, stars, reasons, action):
+    Path("data").mkdir(exist_ok=True)
 
-    os.makedirs("data", exist_ok=True)
+    file = Path("data/history.csv")
 
-    file_exists = os.path.exists(CSV_FILE)
+    exists = file.exists()
 
-    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+    with open(file, "a", newline="", encoding="utf-8") as f:
 
         writer = csv.writer(f)
 
-        if not file_exists:
+        if not exists:
             writer.writerow([
                 "date",
-                "price",
-                "spy_change",
-                "vix",
-                "stars",
-                "action",
-                "reasons"
+                "score",
+                "recommend",
+                "qqq_change",
+                "result"
             ])
 
         writer.writerow([
             datetime.now().strftime("%Y-%m-%d"),
-            round(data["price"], 2),
-            round(data["spy_change"], 2),
-            round(data["vix"], 2),
-            stars,
-            action,
-            " | ".join(reasons)
+            score,
+            recommend,
+            "",
+            "Pending"
         ])

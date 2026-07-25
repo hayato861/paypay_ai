@@ -34,6 +34,8 @@ def score_market(data):
 
     return score, reasons
 
+    score = max(0, min(score, 100))
+
 
 def recommend_courses(data, market_score):
     
@@ -78,6 +80,9 @@ def recommend_courses(data, market_score):
     elif data["vix"] > 25:
         courses["ゴールド"] += 10
         courses["アメリカ長期国債チャレンジ"] += 8
+        
+    for course in courses:
+        courses[course] = min(courses[course], 100)
 
     ranking = sorted(
         courses.items(),

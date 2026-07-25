@@ -1,5 +1,9 @@
+from stats import get_stats
+
 def create_report(data, market_score, reasons, ranking):
-    
+
+    stats = get_stats()
+
     # 星評価
     if market_score >= 85:
         stars = "★★★★★"
@@ -16,6 +20,16 @@ def create_report(data, market_score, reasons, ranking):
 
 市場スコア：{market_score}点
 判定：{stars}
+
+━━━━━━━━━━━━━━
+
+📊 AI実績
+
+予想回数：{stats['total']}回
+勝ち：{stats['win']}回
+負け：{stats['lose']}回
+保留：{stats['pending']}回
+勝率：{stats['win_rate']}%
 
 ━━━━━━━━━━━━━━
 
