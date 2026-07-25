@@ -8,5 +8,3 @@ config.py
 config_local.py
 
 logs/
-
-public/
