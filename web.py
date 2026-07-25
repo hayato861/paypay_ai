@@ -288,7 +288,7 @@ Powered by PayPay AI
 </html>
 """
 
-    Path("public/index.html").write_text(
+    Path("index.html").write_text(
         html,
         encoding="utf-8"
     )
