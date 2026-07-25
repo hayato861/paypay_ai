@@ -1,11 +1,22 @@
 from pathlib import Path
 
-def post(report):
+def create_post(data, ranking, stats, market_score):
 
-    Path("logs").mkdir(exist_ok=True)
+    stars = "★★★★★"
 
-    with open("logs/x_post.txt","w",encoding="utf-8") as f:
+    return f"""📈 PayPay AI
 
-        f.write(report)
+{stars}
 
-    print("X投稿内容を保存しました")
+🥇 {ranking[0][0]}
+
+QQQ {data['change']:+.2f}%
+VIX {data['vix']:.2f}
+
+AI勝率 {stats['win_rate']}%
+
+👇詳細
+https://hayato861.github.io/paypay_ai/
+
+#PayPay運用
+#投資"""

@@ -29,7 +29,13 @@ def main():
 
     print(text)
 
-    publish(text)
+    publish(
+        text,
+        data,
+        market_score,
+        ranking,
+        reasons
+    )
 
 
 if __name__ == "__main__":
