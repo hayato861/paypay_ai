@@ -15,34 +15,17 @@ def create_page(
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    # ------------------------
-    # 市場判定
-    # ------------------------
-
+    # 星評価
     if market_score >= 85:
         stars = "★★★★★"
-        status = "🟢 強気相場"
-        comment = "積極運用がおすすめです"
-
     elif market_score >= 70:
         stars = "★★★★☆"
-        status = "🟢 やや強気"
-        comment = "押し目買いを検討できます"
-
     elif market_score >= 55:
         stars = "★★★☆☆"
-        status = "🟡 中立"
-        comment = "様子を見ながら運用"
-
     elif market_score >= 40:
         stars = "★★☆☆☆"
-        status = "🟠 やや弱気"
-        comment = "守りを意識"
-
     else:
         stars = "★☆☆☆☆"
-        status = "🔴 弱気相場"
-        comment = "慎重な運用がおすすめ"
 
     top_course = ranking[0][0]
     top_score = ranking[0][1]
@@ -50,42 +33,30 @@ def create_page(
     qqq_color = "#22c55e" if data["change"] >= 0 else "#ef4444"
     spy_color = "#22c55e" if data["spy_change"] >= 0 else "#ef4444"
 
-    # ------------------------
-    # AI分析
-    # ------------------------
-
     reason_html = ""
 
     for reason in reasons:
         reason_html += f"<li>{reason}</li>"
 
-    # ------------------------
-    # ランキング
-    # ------------------------
+    ranking_html = ""
 
     medals = ["🥇", "🥈", "🥉"]
 
-    ranking_html = ""
-
     for i, (course, score) in enumerate(ranking):
 
-        icon = medals[i] if i < 3 else f"{i+1}."
+        if i < 3:
+            icon = medals[i]
+        else:
+            icon = f"{i+1}."
 
         ranking_html += f"""
-        <div class="rank-card">
-            <div class="rank-icon">{icon}</div>
-
-            <div class="rank-name">
-                {course}
-            </div>
-
-            <div class="rank-score">
-                {score}点
-            </div>
-        </div>
+        <tr>
+            <td>{icon}</td>
+            <td>{course}</td>
+            <td>{score}点</td>
+        </tr>
         """
-        
-        
+
     html = f"""
 <!DOCTYPE html>
 
@@ -101,90 +72,55 @@ def create_page(
 
 <style>
 
-*{{
-box-sizing:border-box;
-}}
-
 body{{
-margin:0;
-background:#07111f;
+background:#0f172a;
 color:white;
 font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+margin:0;
 }}
 
 .container{{
-max-width:1000px;
+max-width:900px;
 margin:auto;
-padding:25px;
+padding:20px;
 }}
 
-.hero{{
-background:linear-gradient(135deg,#2563eb,#0f766e);
-padding:40px;
-border-radius:24px;
-margin-bottom:25px;
-box-shadow:0 20px 40px rgba(0,0,0,.35);
+.card{{
+background:#1e293b;
+border-radius:20px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
 }}
 
-.hero h1{{
+h1{{
 margin:0;
-font-size:46px;
+font-size:40px;
 }}
 
-.hero p{{
-opacity:.9;
+.subtitle{{
+color:#94a3b8;
 }}
 
-.button{{
-display:inline-block;
-margin-top:18px;
-padding:14px 24px;
-background:#22c55e;
-color:white;
-text-decoration:none;
-border-radius:14px;
+.score{{
+font-size:70px;
 font-weight:bold;
-transition:.2s;
-}}
-
-.button:hover{{
-transform:scale(1.03);
+color:#22c55e;
 }}
 
 .grid{{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-margin-bottom:25px;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
 }}
 
-.card{{
-background:#132238;
-border-radius:20px;
-padding:22px;
-box-shadow:0 12px 25px rgba(0,0,0,.25);
-}}
-
-.title{{
-color:#94a3b8;
+.small{{
 font-size:14px;
-margin-bottom:10px;
-}}
-
-.score{{
-font-size:72px;
-font-weight:bold;
-color:#4ade80;
-}}
-
-.big{{
-font-size:58px;
-font-weight:bold;
-color:#4ade80;
+color:#94a3b8;
 }}
 
 .market{{
-font-size:28px;
+font-size:30px;
 font-weight:bold;
 }}
 
@@ -194,62 +130,18 @@ border-collapse:collapse;
 }}
 
 td{{
-padding:14px;
-border-bottom:1px solid #243447;
+padding:10px;
+border-bottom:1px solid #334155;
 }}
 
-.rank-card{{
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:16px;
-margin-bottom:12px;
-background:#1b314f;
-border-radius:14px;
-}}
-
-.rank-icon{{
-font-size:24px;
-width:45px;
-}}
-
-.rank-name{{
-flex:1;
-font-size:18px;
-}}
-
-.rank-score{{
-font-weight:bold;
-color:#4ade80;
-}}
-
-.info{{
-background:#1b314f;
-padding:18px;
-border-radius:14px;
-line-height:1.8;
+ul{{
+padding-left:20px;
 }}
 
 footer{{
 text-align:center;
 padding:30px;
 color:#94a3b8;
-}}
-
-@media(max-width:700px){{
-
-.hero h1{{
-font-size:34px;
-}}
-
-.score{{
-font-size:58px;
-}}
-
-.big{{
-font-size:44px;
-}}
-
 }}
 
 </style>
@@ -260,32 +152,21 @@ font-size:44px;
 
 <div class="container">
 
-<div class="hero">
+<div class="card">
 
 <h1>📈 PayPay AI</h1>
 
-<p>
+<div class="subtitle">
 
-AIが毎朝マーケットを分析し、
-PayPayポイント運用をサポートします。
-
-</p>
-
-<div>
-
-<strong>{status}</strong>
-
-<br>
-
-{comment}
+毎朝7:30 自動更新
 
 </div>
 
-<a class="button" href="#">
+<div class="small">
 
-📲 LINEで毎朝受け取る
+更新日時：{now}
 
-</a>
+</div>
 
 </div>
 
@@ -293,84 +174,33 @@ PayPayポイント運用をサポートします。
 
 <div class="card">
 
-<div class="title">
+<div class="small">市場スコア</div>
 
-市場スコア
+<div class="score">{market_score}</div>
 
-</div>
-
-<div class="score">
-
-{market_score}
-
-</div>
-
-<div class="market">
-
-{stars}
-
-</div>
-
-<p>
-
-{status}
-
-</p>
+<div>{stars}</div>
 
 </div>
 
 <div class="card">
 
-<div class="title">
+<div class="small">今日のおすすめ</div>
 
-今日のおすすめ
+<h2>🥇 {top_course}</h2>
 
-</div>
-
-<h2>
-
-🥇 {top_course}
-
-</h2>
-
-<div class="big">
-
-{top_score}
-
-</div>
-
-<p>
-
-AIおすすめコース
-
-</p>
+<p>{top_score}点</p>
 
 </div>
 
 <div class="card">
 
-<div class="title">
-
-AI実績
-
-</div>
-
-<div class="big">
-
-{stats["win_rate"]}%
-
-</div>
+<div class="small">AI実績</div>
 
 <p>
 
-予想 {stats["total"]}回
-
-<br>
-
-勝ち {stats["win"]}
-
-<br>
-
+勝率 {stats["win_rate"]}%<br>
+予想 {stats["total"]}回<br>
+勝ち {stats["win"]}<br>
 負け {stats["lose"]}
 
 </p>
@@ -379,84 +209,9 @@ AI実績
 
 </div>
 
-
 <div class="card">
 
-<h2>
-
-📊 市場スコアとは？
-
-</h2>
-
-<div class="info">
-
-PayPay AIが毎朝マーケットを分析して作成する
-<strong>100点満点の独自指標</strong>です。
-
-<br><br>
-
-評価対象
-
-<ul>
-
-<li>📈 QQQ（NASDAQ100）</li>
-
-<li>📊 S&P500</li>
-
-<li>😨 VIX（恐怖指数）</li>
-
-</ul>
-
-<strong>
-
-80〜100点
-
-</strong>
-
-積極運用がおすすめ
-
-<br><br>
-
-<strong>
-
-60〜79点
-
-</strong>
-
-やや強気
-
-<br><br>
-
-<strong>
-
-40〜59点
-
-</strong>
-
-中立
-
-<br><br>
-
-<strong>
-
-0〜39点
-
-</strong>
-
-慎重な運用
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>
-
-📊 今日の市場データ
-
-</h2>
+<h2>📊 市場データ</h2>
 
 <table>
 
@@ -464,7 +219,7 @@ PayPay AIが毎朝マーケットを分析して作成する
 
 <td>QQQ</td>
 
-<td style="color:{qqq_color};font-weight:bold;">
+<td style="color:{qqq_color}">
 
 {data["change"]:+.2f}%
 
@@ -476,7 +231,7 @@ PayPay AIが毎朝マーケットを分析して作成する
 
 <td>S&P500</td>
 
-<td style="color:{spy_color};font-weight:bold;">
+<td style="color:{spy_color}">
 
 {data["spy_change"]:+.2f}%
 
@@ -488,11 +243,7 @@ PayPay AIが毎朝マーケットを分析して作成する
 
 <td>VIX</td>
 
-<td>
-
-{data["vix"]:.2f}
-
-</td>
+<td>{data["vix"]:.2f}</td>
 
 </tr>
 
@@ -502,11 +253,55 @@ PayPay AIが毎朝マーケットを分析して作成する
 
 <div class="card">
 
-<h2>
+<h2>📈 市場スコアとは？</h2>
 
-🧠 AI分析
+<p>
 
-</h2>
+<strong>市場スコア</strong>は、PayPay AIが毎朝マーケットを分析して算出する
+<strong>100点満点の独自評価</strong>です。
+
+</p>
+
+<table>
+
+<tr>
+<td>80〜100</td>
+<td>★★★★★ 強気相場</td>
+</tr>
+
+<tr>
+<td>60〜79</td>
+<td>★★★★☆ やや強気</td>
+</tr>
+
+<tr>
+<td>40〜59</td>
+<td>★★★☆☆ 中立</td>
+</tr>
+
+<tr>
+<td>20〜39</td>
+<td>★★☆☆☆ やや弱気</td>
+</tr>
+
+<tr>
+<td>0〜19</td>
+<td>★☆☆☆☆ 弱気</td>
+</tr>
+
+</table>
+
+<p class="small">
+
+※ QQQ・S&P500・VIXなどをもとにAIが毎朝判定しています。
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>🧠 AI分析</h2>
 
 <ul>
 
@@ -518,44 +313,19 @@ PayPay AIが毎朝マーケットを分析して作成する
 
 <div class="card">
 
-<h2>
+<h2>🏆 おすすめランキング</h2>
 
-🏆 おすすめランキング
-
-</h2>
+<table>
 
 {ranking_html}
+
+</table>
 
 </div>
 
 <footer>
 
-<hr style="border:1px solid #243447;">
-
-<p>
-
-📈 Powered by <strong>PayPay AI</strong>
-
-</p>
-
-<p>
-
-Version 1.1
-
-</p>
-
-<p>
-
-更新日時：{now}
-
-</p>
-
-<p style="font-size:14px;color:#94a3b8;">
-
-このサイトはAIが毎朝マーケットを分析し、
-PayPayポイント運用の参考情報を提供しています。
-
-</p>
+Powered by PayPay AI
 
 </footer>
 
@@ -571,4 +341,4 @@ PayPayポイント運用の参考情報を提供しています。
         encoding="utf-8"
     )
 
-    print("🌐 Webページ更新")
+    print("Webページ更新")

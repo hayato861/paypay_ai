@@ -28,6 +28,8 @@ def main():
     )
 
     print(text)
+    
+    print(reasons)
 
     publish(
         text,

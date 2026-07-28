@@ -1,0 +1,83 @@
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#07111f;
+    color:white;
+    font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:25px;
+}
+
+.hero{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(135deg,#2563eb,#0891b2,#059669);
+    background-size:300% 300%;
+    animation:heroGradient 10s ease infinite;
+    padding:48px;
+    border-radius:28px;
+    margin-bottom:28px;
+    box-shadow:
+        0 20px 40px rgba(0,0,0,.35),
+        inset 0 1px rgba(255,255,255,.15);
+}
+.hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+        radial-gradient(circle at top right,
+        rgba(255,255,255,.18),
+        transparent 45%);
+    pointer-events:none;
+}
+@keyframes heroGradient{
+0%{
+background-position:0% 50%;
+}
+50%{
+background-position:100% 50%;
+}
+100%{
+background-position:0% 50%;
+}
+
+}
+
+.hero h1{
+font-size:52px;
+margin:0;
+font-weight:800;
+letter-spacing:-1px;
+}
+
+.hero p{
+font-size:18px;
+opacity:.92;
+margin-top:10px;
+}
+
+.button{
+display:inline-block;
+margin-top:24px;
+padding:15px 28px;
+background:white;
+color:#0f172a;
+font-weight:bold;
+border-radius:16px;
+text-decoration:none;
+transition:.25s;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.button:hover{
+transform:translateY(-3px);
+box-shadow:0 14px 30px rgba(0,0,0,.35);
+}

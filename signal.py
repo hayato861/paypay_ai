@@ -4,37 +4,86 @@ def score_market(data):
     reasons = []
 
     # QQQ
-    if data["change"] > 1:
-        score += 15
-        reasons.append("QQQが1%以上上昇しています")
+    if data["change"] > 2:
 
-    elif data["change"] < -1:
-        score -= 15
-        reasons.append("QQQが1%以上下落しています")
+        score += 20
+        reasons.append("QQQが大きく上昇しています")
+
+    elif data["change"] > 0:
+
+        score += 5
+        reasons.append("QQQは上昇しています")
+
+    elif data["change"] < -2:
+
+        score -= 20
+        reasons.append("QQQが大きく下落しています")
+
+    elif data["change"] < 0:
+
+        score -= 5
+        reasons.append("QQQは下落しています")
 
     # S&P500
-    if data["spy_change"] > 0.5:
-        score += 10
-        reasons.append("S&P500が堅調です")
+    if data["spy_change"] > 0:
 
-    elif data["spy_change"] < -0.5:
-        score -= 10
-        reasons.append("S&P500が弱い動きです")
+        score += 5
+        reasons.append("S&P500が上昇しています")
+
+    elif data["spy_change"] < 0:
+
+        score -= 5
+        reasons.append("S&P500が下落しています")
 
     # VIX
-    if data["vix"] < 18:
+    if data["vix"] < 16:
+
         score += 10
-        reasons.append("VIXが低く市場心理は良好です")
+        reasons.append("VIXが非常に低く市場心理は良好です")
+
+    elif data["vix"] < 20:
+
+        score += 5
+        reasons.append("VIXは落ち着いています")
+
+    elif data["vix"] > 30:
+
+        score -= 25
+        reasons.append("VIXが急上昇し警戒が必要です")
 
     elif data["vix"] > 25:
-        score -= 20
-        reasons.append("VIXが高く警戒が必要です")
+
+        score -= 15
+        reasons.append("VIXが高く注意が必要です")
 
     score = max(0, min(score, 100))
+    
+        # 何も理由がない場合
+    if not reasons:
 
+        if score >= 70:
+            reasons.append("市場は強気です。")
+
+        elif score >= 40:
+            reasons.append("市場は中立です。")
+
+        else:
+            reasons.append("市場は慎重相場です。")
+    
+    
+        # 何も理由がない場合
+    if not reasons:
+
+        if score >= 70:
+            reasons.append("市場は強気です。")
+
+        elif score >= 40:
+            reasons.append("市場は中立です。")
+
+        else:
+            reasons.append("市場は慎重相場です。")
+            
     return score, reasons
-
-    score = max(0, min(score, 100))
 
 
 def recommend_courses(data, market_score):
