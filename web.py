@@ -8,7 +8,8 @@ def create_page(
     data,
     market_score,
     ranking,
-    reasons
+    reasons,
+    insight
 ):
 
     stats = get_stats()
@@ -37,6 +38,11 @@ def create_page(
 
     for reason in reasons:
         reason_html += f"<li>{reason}</li>"
+
+    insight_html = ""
+
+    for item in insight:
+        insight_html += f"<li>{item}</li>"
 
     ranking_html = ""
 
@@ -70,81 +76,7 @@ def create_page(
 
 <title>PayPay AI</title>
 
-<style>
-
-body{{
-background:#0f172a;
-color:white;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-margin:0;
-}}
-
-.container{{
-max-width:900px;
-margin:auto;
-padding:20px;
-}}
-
-.card{{
-background:#1e293b;
-border-radius:20px;
-padding:20px;
-margin-bottom:20px;
-box-shadow:0 10px 30px rgba(0,0,0,.35);
-}}
-
-h1{{
-margin:0;
-font-size:40px;
-}}
-
-.subtitle{{
-color:#94a3b8;
-}}
-
-.score{{
-font-size:70px;
-font-weight:bold;
-color:#22c55e;
-}}
-
-.grid{{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:15px;
-}}
-
-.small{{
-font-size:14px;
-color:#94a3b8;
-}}
-
-.market{{
-font-size:30px;
-font-weight:bold;
-}}
-
-table{{
-width:100%;
-border-collapse:collapse;
-}}
-
-td{{
-padding:10px;
-border-bottom:1px solid #334155;
-}}
-
-ul{{
-padding-left:20px;
-}}
-
-footer{{
-text-align:center;
-padding:30px;
-color:#94a3b8;
-}}
-
-</style>
+<link rel="stylesheet" href="css/style.css">
 
 </head>
 
@@ -152,49 +84,62 @@ color:#94a3b8;
 
 <div class="container">
 
-<div class="card">
+<div class="card header-card">
 
-<h1>📈 PayPay AI</h1>
+<h1>
+📈 PayPay AI
+</h1>
 
 <div class="subtitle">
-
 毎朝7:30 自動更新
-
 </div>
 
 <div class="small">
-
 更新日時：{now}
-
 </div>
 
 </div>
+
 
 <div class="grid">
 
 <div class="card">
 
-<div class="small">市場スコア</div>
+<div class="small">
+市場スコア
+</div>
 
-<div class="score">{market_score}</div>
+<div class="score">
+{market_score}
+</div>
 
-<div>{stars}</div>
+<div class="market">
+{stars}
+</div>
 
 </div>
 
 <div class="card">
 
-<div class="small">今日のおすすめ</div>
+<div class="small">
+今日のおすすめ
+</div>
 
-<h2>🥇 {top_course}</h2>
+<h2>
+🥇 {top_course}
+</h2>
 
-<p>{top_score}点</p>
+<p>
+{top_score}点
+</p>
 
 </div>
 
 <div class="card">
 
-<div class="small">AI実績</div>
+<div class="small">
+AI実績
+</div>
 
 <p>
 
@@ -211,7 +156,9 @@ color:#94a3b8;
 
 <div class="card">
 
-<h2>📊 市場データ</h2>
+<h2>
+📊 市場データ
+</h2>
 
 <table>
 
@@ -299,17 +246,11 @@ color:#94a3b8;
 
 </div>
 
-<div class="card">
-
-<h2>🧠 AI分析</h2>
-
 <ul>
 
-{reason_html}
+{insight_html}
 
 </ul>
-
-</div>
 
 <div class="card">
 
@@ -336,9 +277,11 @@ Powered by PayPay AI
 </html>
 """
 
-    Path("index.html").write_text(
+    output = Path("index.html")
+
+    output.write_text(
         html,
         encoding="utf-8"
     )
 
-    print("Webページ更新")
+    print("保存先:", output.resolve())

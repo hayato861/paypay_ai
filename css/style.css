@@ -15,19 +15,8 @@ body{
     padding:25px;
 }
 
-.hero{
-    position:relative;
-    overflow:hidden;
-    background:linear-gradient(135deg,#2563eb,#0891b2,#059669);
-    background-size:300% 300%;
-    animation:heroGradient 10s ease infinite;
-    padding:48px;
-    border-radius:28px;
-    margin-bottom:28px;
-    box-shadow:
-        0 20px 40px rgba(0,0,0,.35),
-        inset 0 1px rgba(255,255,255,.15);
-}
+
+
 .hero::before{
     content:"";
     position:absolute;
@@ -64,20 +53,65 @@ opacity:.92;
 margin-top:10px;
 }
 
-.button{
-display:inline-block;
-margin-top:24px;
-padding:15px 28px;
-background:white;
-color:#0f172a;
-font-weight:bold;
-border-radius:16px;
-text-decoration:none;
-transition:.25s;
-box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
 
 .button:hover{
 transform:translateY(-3px);
 box-shadow:0 14px 30px rgba(0,0,0,.35);
+}
+
+
+
+
+
+.gauge-ring span{
+
+width:120px;
+height:120px;
+
+background:#1e293b;
+
+border-radius:50%;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:42px;
+font-weight:bold;
+
+}
+
+.card{
+background:#1e293b;
+border-radius:20px;
+padding:20px;
+margin-bottom:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+
+.header-card{
+    background:linear-gradient(135deg,#2563eb,#0891b2);
+    padding:40px;
+    border-radius:24px;
+    margin-bottom:25px;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+    color:white;
+}
+
+.header-card::after{
+
+content:"";
+
+position:absolute;
+
+right:-80px;
+top:-80px;
+
+width:220px;
+height:220px;
+
+background:rgba(255,255,255,.08);
+
+border-radius:50%;
+
 }

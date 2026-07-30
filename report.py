@@ -1,6 +1,6 @@
 from stats import get_stats
 
-def create_report(data, market_score, reasons, ranking):
+def create_report(data, market_score, reasons, ranking, insight):
 
     stats = get_stats()
 
@@ -42,6 +42,14 @@ VIX      : {data['vix']:.2f}
 
 🧠 AI分析
 """
+
+    report += "\n━━━━━━━━━━━━━━\n"
+
+    report += "📌 AIインサイト\n\n"
+
+    for line in insight:
+
+        report += f"・{line}\n"
 
     if reasons:
         for reason in reasons:
