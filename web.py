@@ -154,6 +154,8 @@ AI実績
 
 </div>
 
+<div class="grid2">
+
 <div class="card">
 
 <h2>
@@ -200,8 +202,25 @@ AI実績
 
 <div class="card">
 
-<h2>📈 市場スコアとは？</h2>
+<h2>
+🧠 AIインサイト
+</h2>
 
+<ul>
+
+{insight_html}
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+📈 市場スコアとは？
+</h2>
 <p>
 
 <strong>市場スコア</strong>は、PayPay AIが毎朝マーケットを分析して算出する

@@ -3,9 +3,6 @@ from x import post
 from web import create_page
 from logger import log
 
-print("publisher.py が呼ばれました")
-
-
 def publish(
     report,
     data,
