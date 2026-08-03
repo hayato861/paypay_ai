@@ -1,6 +1,9 @@
 from datetime import datetime
+from pathlib import Path
 
 def log(message):
+    
+    Path("logs").mkdir(exist_ok=True)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
