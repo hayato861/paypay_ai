@@ -3,28 +3,84 @@
 
 <html lang="ja">
 
-<head>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>PayPay AI</title>
+        <link rel="stylesheet" href="css/style.css">
+    </head>
 
-<meta charset="utf-8">
+    <body>
+        <div class="container">
+            <div class="card header-card">
+                <h1>
+                    📈 PayPay AI
+                </h1>
+                
+                <div class="subtitle">
+                    毎朝 自動更新
+                </div>
+                
+                <div class="small">
+                    更新日時：2026-08-06 12:52
+                </div>
+            </div>
+    <div class="grid">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- 市場スコア -->
+    <div class="card">
 
-<title>PayPay AI</title>
+        <div class="small">
+            <h2>市場スコア</h2>
+        </div>
+        <div
+        class="score"
+        style="color:#facc15;">
 
-<link rel="stylesheet" href="css/style.css">
+        50
+        </div>
+        <div class="market">
+            ★★☆☆☆
+        </div>
+        <p class="small">
+            🟡 中立
+        </p>
+        <p class="small" style="color:#ef4444;">
+            昨日比 -30点
+        </p>
+    </div>
 
-</head>
+        <!-- 市場スコア推移 -->
+        <div class="card">
+            <h2>📈 市場スコア推移</h2>
+            <div class="chart-area">
+                <canvas id="scoreChart"></canvas>
+            </div>
+        </div>
 
-<body>
+        <!-- AI実績 -->
+        <div class="card">
+            <div class="small">
+                <h2>AI実績</h2>
+            </div>
+<div class="stats-grid">
 
-<div class="container">
+    <div class="stat-box">
+        <div class="stat-title">勝率</div>
+        <div class="stat-value">100.0%</div>
+    </div>
 
-<div class="card header-card">
+    <div class="stat-box">
+        <div class="stat-title">予想</div>
+        <div class="stat-value">16</div>
+    </div>
 
-<h1>
-📈 PayPay AI
-</h1>
+    <div class="stat-box">
+        <div class="stat-title">勝ち</div>
+        <div class="stat-value">15</div>
+    </div>
 
+<<<<<<< HEAD
 <div class="subtitle">
 毎朝7:30 自動更新
 </div>
@@ -213,6 +269,138 @@ AI実績
 <table>
 
 
+=======
+    <div class="stat-box">
+        <div class="stat-title">負け</div>
+        <div class="stat-value">0</div>
+    </div>
+
+</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- 今日のおすすめ -->
+        <div class="card">
+            <div class="small">
+                今日のおすすめ
+            </div>
+            <h2>
+                &nbsp;🥇 テクノロジーチャレンジ
+            </h2>
+            <div class="score-mini">
+                &nbsp;85点
+            </div>
+            <p class="small">
+               &nbsp; 📈 強気相場向き
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>📝 AIコメント</h2>
+            <p>
+                🤔 市場は方向感がありません。焦って売買せず、様子を見ながら積立を続ける局面です。<br><br>今日の市場判断：<br>・QQQは下落しています<br>・S&P500が下落しています<br>・VIXが非常に低く市場心理は良好です<br>
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🕒 最近のおすすめ</h2>
+            <table>
+                
+    <tr>
+    <td>08-06</td>
+    <td>テクノロジーチャレンジ</td>
+    </tr>
+    
+    <tr>
+    <td>08-05</td>
+    <td>テクノロジーチャレンジ</td>
+    </tr>
+    
+    <tr>
+    <td>08-04</td>
+    <td>テクノロジーチャレンジ</td>
+    </tr>
+    
+    <tr>
+    <td>08-03</td>
+    <td>テクノロジーチャレンジ</td>
+    </tr>
+    
+    <tr>
+    <td>08-02</td>
+    <td>テクノロジーチャレンジ</td>
+    </tr>
+    
+            </table>
+        </div>
+    </div>
+
+
+    <div class="grid2">
+        <div class="card">
+            <h2>📊 市場データ</h2>
+            <table>
+                <tr>
+                    <td>QQQ</td>
+                    <td style="color:#ef4444">
+                        -0.90%
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>S&P500</td>
+                    <td style="color:#ef4444">
+                        -0.20%
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>VIX</td>
+                    <td>15.81</td>
+                </tr>
+                
+                <tr>
+                    <td>Fear & Greed</td>
+                    <td style="color:#facc15">
+                        50
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>ドル円</td>
+                    <td>157.72</td>
+                </tr>
+
+                <tr>
+                    <td>米10年金利</td>
+                    <td>4.62%</td>
+                </tr>
+
+                <tr>
+                    <td>ゴールド</td>
+                    <td style="color:#22c55e">
+                        +4.14%
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🧠 AIインサイト</h2>
+            <ul>
+                <li>📉 昨日より -30点</li><li>📊 7日平均 70.0点</li><li>🏆 過去最高 85点</li><li>📉 過去最低 25点</li><li>⚠️ 2日連続で悪化</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="grid-center">
+        <div class="card">
+            <h2>🏆 おすすめランキング</h2>
+            <table>
+                
+>>>>>>> 103f62c (v1.4 HTML_finish-1)
         <tr>
             <td>🥇</td>
             <td>テクノロジーチャレンジ</td>
@@ -255,19 +443,72 @@ AI実績
             <td>80点</td>
         </tr>
         
+            </table>
+        </div>
+        
+        <div class="card">
+            <h2>📈 市場スコアとは？</h2>
+            <p>
+                <strong>市場スコア</strong>は、
+                PayPay AIが毎朝マーケットを分析して<br>
+                算出する<strong>100点満点の独自評価</strong>です。
+            </p>
 
-</table>
+            <table>
 
-</div>
+                <tr>
+                    <td>80〜100</td>
+                    <td>★★★★★ 強気相場</td>
+                </tr>
 
-<footer>
+                <tr>
+                    <td>60〜79</td>
+                    <td>★★★★☆ やや強気</td>
+                </tr>
 
-Powered by PayPay AI
+                <tr>
+                    <td>40〜59</td>
+                    <td>★★★☆☆ 中立</td>
+                </tr>
 
-</footer>
+                <tr>
+                    <td>20〜39</td>
+                    <td>★★☆☆☆ やや弱気</td>
+                </tr>
 
-</div>
+                <tr>
+                    <td>0〜19</td>
+                    <td>★☆☆☆☆ 弱気</td>
+                </tr>
 
-</body>
+            </table>
+
+            <p class="small">
+
+                ※ QQQ・S&P500・VIX・Fear & Greed指数などを<br>
+                もとにAIが毎朝判定しています。
+
+            </p>
+
+        </div>
+
+    </div>
+
+        <footer>
+            Powered by PayPay AI
+        </footer>
+
+    </div>
+
+    </body>
+    
+    
+    <script>
+        const scoreLabels = ["07-24", "07-25", "07-26", "07-27", "07-28", "07-29", "07-30", "07-31", "08-01", "08-02", "08-03", "08-04", "08-05", "08-06"];
+        const scoreData = [25, 35, 35, 35, 55, 55, 25, 80, 70, 70, 70, 70, 80, 50];
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/chart.js"></script>
 
 </html>

@@ -1,7 +1,30 @@
 def score_market(data):
     
     score = 50
+
     reasons = []
+
+    fg = data["fear_greed"]
+
+    if fg >= 80:
+
+        score += 15
+        reasons.append("Fear & Greedは極めて強気です")
+
+    elif fg >= 60:
+
+        score += 8
+        reasons.append("Fear & Greedは強気です")
+
+    elif fg <= 20:
+
+        score -= 15
+        reasons.append("Fear & Greedは極度の恐怖です")
+
+    elif fg <= 40:
+
+        score -= 8
+        reasons.append("Fear & Greedは弱気です")
 
     # QQQ
     if data["change"] > 2:
@@ -69,24 +92,23 @@ def score_market(data):
 
         else:
             reasons.append("市場は慎重相場です。")
-    
-    
-        # 何も理由がない場合
-    if not reasons:
-
-        if score >= 70:
-            reasons.append("市場は強気です。")
-
-        elif score >= 40:
-            reasons.append("市場は中立です。")
-
-        else:
-            reasons.append("市場は慎重相場です。")
             
     return score, reasons
 
 
 def recommend_courses(data, market_score):
+    
+    fg = data["fear_greed"]
+    
+    if fg >= 75:
+
+        courses["テクノロジーチャレンジ"] += 5
+        courses["テクノロジー"] += 5
+
+    elif fg <= 25:
+
+        courses["ゴールド"] += 5
+        courses["逆チャレンジ"] += 5
     
     courses = {
         "テクノロジーチャレンジ": 80,

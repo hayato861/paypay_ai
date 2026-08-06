@@ -163,3 +163,9 @@ def streak_down():
             break
 
     return count
+
+def recent_history(days=14):
+
+    history = load_history()
+
+    return history[-days:]

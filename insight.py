@@ -52,3 +52,5 @@ def create_insight():
         lines.append("🛡️ 3日連続 守備相場")
 
     return lines
+
+    
