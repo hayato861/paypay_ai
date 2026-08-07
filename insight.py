@@ -53,4 +53,25 @@ def create_insight():
 
     return lines
 
-    
+def create_comment(score):
+
+    if score >= 80:
+        return (
+            "米国市場は非常に強い状態です。"
+            "押し目買いが有効と考えられます。"
+        )
+    elif score >= 60:
+        return (
+            "市場は安定しています。"
+            "積立継続に適した地合いです。"
+        )
+    elif score >= 40:
+        return (
+            "市場は方向感に欠けています。"
+            "焦らず様子を見るのがおすすめです。"
+        )
+    else:
+        return (
+            "市場は弱気です。"
+            "守りを意識した運用が良いでしょう。"
+        )

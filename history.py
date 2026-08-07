@@ -59,7 +59,12 @@ def load_history():
 
         for row in reader:
 
-            row["score"] = int(row["score"])
+            score = row.get("score", "").strip()
+
+            if score == "":
+                row["score"] = 0
+            else:
+                row["score"] = int(score)
 
             rows.append(row)
 

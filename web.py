@@ -31,19 +31,16 @@ def create_page(
             "😊 市場は比較的安定しています。"
             "通常通り積立を続けながら、押し目があれば追加投資も検討できます。"
         )
-
     elif market_score >= 40:
         comment = (
             "🤔 市場は方向感がありません。"
             "焦って売買せず、様子を見ながら積立を続ける局面です。"
         )
-
     else:
         comment = (
             "⚠️ 市場は弱気です。"
             "無理な買い増しは避け、防御的な運用を意識しましょう。"
         )
-        
     comment += "<br><br>"
 
     comment += "今日の市場判断：<br>"
@@ -62,7 +59,7 @@ def create_page(
         market_text = "🔴 弱気相場"
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M")
-    
+
     history = recent_history()
     
     delta = 0
@@ -110,13 +107,10 @@ def create_page(
 
     if top_course == "テクノロジーチャレンジ":
         recommend_reason = "📈 強気相場向き"
-
     elif top_course == "ゴールド":
         recommend_reason = "🛡 リスク回避"
-
     elif top_course == "逆チャレンジ":
         recommend_reason = "📉 下落対策"
-
     elif top_course == "アメリカ長期国債チャレンジ":
         recommend_reason = "💰 金利低下期待"
 
@@ -132,7 +126,6 @@ def create_page(
 
     if data["usdjpy"] < 145:
         usd_color = "#38bdf8"
-
     if data["usdjpy"] < 140:
         usd_color = "#ef4444"
     
@@ -214,69 +207,66 @@ def create_page(
                     更新日時：{now}
                 </div>
             </div>
-    <div class="grid">
+            
+            <div class="grid">
+                <!-- 市場スコア -->
+                <div class="card">
 
-        <!-- 市場スコア -->
-    <div class="card">
+                    <div class="small">
+                        <h2>市場スコア</h2>
+                    </div>
+                    <div class="score" style="color:{score_color};">
+                    {market_score}
+                    </div>
+                    <div class="market">
+                        {stars}
+                    </div>
+                    <p class="small">
+                        {market_text}
+                    </p>
+                    <p class="small" style="color:{delta_color};">
+                        前日比 {delta:+}点
+                    </p>
+                </div>
 
-        <div class="small">
-            <h2>市場スコア</h2>
+                <!-- 市場スコア推移 -->
+                <div class="card">
+                    <h2>📈 市場スコア推移</h2>
+                    <div class="chart-area">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI実績 -->
+                <div class="card">
+                    <div class="small">
+                        <h2>AI実績</h2>
+                    </div>
+    <div class="stats-grid">
+
+        <div class="stat-box">
+            <div class="stat-title">勝率</div>
+            <div class="stat-value">{stats["win_rate"]}%</div>
         </div>
-        <div
-        class="score"
-        style="color:{score_color};">
 
-        {market_score}
-        </div>
-        <div class="market">
-            {stars}
-        </div>
-        <p class="small">
-            {market_text}
-        </p>
-        <p class="small" style="color:{delta_color};">
-            昨日比 {delta:+}点
-        </p>
-    </div>
-
-        <!-- 市場スコア推移 -->
-        <div class="card">
-            <h2>📈 市場スコア推移</h2>
-            <div class="chart-area">
-                <canvas id="scoreChart"></canvas>
-            </div>
+        <div class="stat-box">
+            <div class="stat-title">予想</div>
+            <div class="stat-value">{stats["total"]}</div>
         </div>
 
-        <!-- AI実績 -->
-        <div class="card">
-            <div class="small">
-                <h2>AI実績</h2>
-            </div>
-<div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-title">勝ち</div>
+            <div class="stat-value">{stats["win"]}</div>
+        </div>
 
-    <div class="stat-box">
-        <div class="stat-title">勝率</div>
-        <div class="stat-value">{stats["win_rate"]}%</div>
+        <div class="stat-box">
+            <div class="stat-title">負け</div>
+            <div class="stat-value">{stats["lose"]}</div>
+        </div>
+
     </div>
-
-    <div class="stat-box">
-        <div class="stat-title">予想</div>
-        <div class="stat-value">{stats["total"]}</div>
-    </div>
-
-    <div class="stat-box">
-        <div class="stat-title">勝ち</div>
-        <div class="stat-value">{stats["win"]}</div>
-    </div>
-
-    <div class="stat-box">
-        <div class="stat-title">負け</div>
-        <div class="stat-value">{stats["lose"]}</div>
-    </div>
-
 </div>
-        </div>
-    </div>
+</div>
 
     <div class="grid">
         <!-- 今日のおすすめ -->

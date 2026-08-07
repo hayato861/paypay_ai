@@ -53,6 +53,18 @@ def get_market_data():
         / spy_hist["Close"].iloc[-2]
         * 100
     )
+    
+    tnx_change = (
+    (tnx_hist["Close"].iloc[-1] - tnx_hist["Close"].iloc[-2])
+    / tnx_hist["Close"].iloc[-2]
+    * 100
+)
+
+    usdjpy_change = (
+        (usdjpy_hist["Close"].iloc[-1] - usdjpy_hist["Close"].iloc[-2])
+        / usdjpy_hist["Close"].iloc[-2]
+        * 100
+    )
 
     vix_value = float(vix_hist["Close"].iloc[-1])
 
@@ -60,7 +72,9 @@ def get_market_data():
     ma75 = float(qqq_hist["MA75"].iloc[-1])
 
     fear_greed = get_fear_greed()
-
+    
+    
+    
 
     return {
         "change": change,
@@ -72,22 +86,24 @@ def get_market_data():
         "gold_change": gold_change,
         "tnx": tnx_value,
         "usdjpy": usdjpy_value,
+        "tnx_change": tnx_change,
+        "usdjpy_change": usdjpy_change,
     }
     
 def get_fear_greed():
-
     try:
-
         url = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
+        headers = {
+            "User-Agent": "Mozilla/5.0"
+        }
+        r = requests.get(url, headers=headers, timeout=10)
 
-        r = requests.get(url, timeout=10)
-
+        if r.status_code != 200:
+            return 50
         data = r.json()
 
         return int(data["fear_and_greed"]["score"])
-
     except Exception as e:
 
-        print("Fear&Greed取得失敗", e)
-
+        print("Fear & Greed取得失敗:", e)
         return 50

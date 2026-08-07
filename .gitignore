@@ -3,6 +3,7 @@ __pycache__/
 .env
 .vscode/
 .DS_Store
+.data/
 
 config.py
 config_local.py
