@@ -2,48 +2,79 @@ from pathlib import Path
 from stats import get_stats
 
 
-def create_post(data, ranking, market_score):
+def create_x_post(data, market_score, ranking, insight):
 
-    stats = get_stats()
+    top_course = ranking[0][0]
+    top_score = ranking[0][1]
 
-    # 星評価
-    if market_score >= 85:
-        stars = "★★★★★"
-    elif market_score >= 70:
-        stars = "★★★★☆"
-    elif market_score >= 55:
-        stars = "★★★☆☆"
+    # 市場判定
+    if market_score >= 80:
+        market_text = "★★★★★ 強気"
+
+    elif market_score >= 60:
+        market_text = "★★★★☆ やや強気"
+
     elif market_score >= 40:
-        stars = "★★☆☆☆"
+        market_text = "★★★☆☆ 中立"
+
+    elif market_score >= 20:
+        market_text = "★★☆☆☆ やや弱気"
+
     else:
-        stars = "★☆☆☆☆"
+        market_text = "★☆☆☆☆ 弱気"
 
-    return f"""📈 PayPay AI
 
-{stars}
+    # AIインサイト
+    insight_text = ""
+
+    for item in insight[:4]:
+        insight_text += f"・{item}\n"
+
+
+    text = f"""📈 PayPay AI Morning Report
+
+市場スコア：{market_score} / 100
+{market_text}
 
 🥇 今日のおすすめ
-{ranking[0][0]}
+{top_course}
+{top_score}点
 
-QQQ {data['change']:+.2f}%
-S&P500 {data['spy_change']:+.2f}%
-VIX {data['vix']:.2f}
+📊 市場
+QQQ {data["change"]:+.2f}%
+S&P500 {data["spy_change"]:+.2f}%
+VIX {data["vix"]:.2f}
 
-AI勝率 {stats['win_rate']}%
+🧠 AIインサイト
+{insight_text}
 
-👇詳細
-https://hayato861.github.io/paypay_ai/
-
-#PayPay運用
-#投資
+毎朝自動更新しています。
 """
 
+    return text
 
-def post(report):
 
-    Path("logs/x_post.txt").write_text(
+def post(report, image_path=None):
+
+    # X投稿内容を保存
+    output = Path("logs/x_post.txt")
+
+    output.parent.mkdir(
+        exist_ok=True
+    )
+
+    output.write_text(
         report,
         encoding="utf-8"
     )
 
     print("X投稿内容を保存しました")
+
+    # 画像が生成されている場合
+    if image_path:
+
+        print("X投稿画像:", image_path)
+
+    else:
+
+        print("X投稿画像なし")
