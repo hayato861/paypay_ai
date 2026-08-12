@@ -1,5 +1,5 @@
 from market import get_market_data
-from signal import score_market, recommend_courses
+from scoring import score_market, recommend_courses
 from report import create_report
 from publisher import publish
 from grader import grade
