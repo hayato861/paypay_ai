@@ -25,13 +25,14 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: '3.11'
           cache: "pip"
 
       - name: Check Python version
         run: |
           python --version
           python -m pip --version
+          which python
 
       - name: Install dependencies
         run: |
@@ -61,4 +62,5 @@ jobs:
           fi
 
           git commit -m "Auto Update PayPay AI"
-          git push origin main
+
+          git push origin HEAD:main
