@@ -5,3 +5,4 @@ requests
 openai
 python-dotenv
 beautifulsoup4
+Pillow
