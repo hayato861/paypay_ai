@@ -1,7 +1,6 @@
 import yfinance as yf
 import pandas as pd
 from pathlib import Path
-import pandas as pd
 import numpy as np
 from scoring import score_market, recommend_courses
 
@@ -170,8 +169,11 @@ TICKERS = {
 def load_market_history(period="5y"):
     """
     過去の市場データをまとめて取得する。
-    各市場の休場日が異なるため、
-    日付を outer join して前回値で補完する。
+    予測対象はQQQなので、QQQの取引日だけを評価日として使う。
+    他市場の休場日は、その時点で利用可能な直近値で補完する。
+
+    outer joinを使うとQQQ休場日にも0%リターンの行が作られ、
+    翌営業日予測の勝率を歪めるため使用しない。
     """
 
     print("📥 過去データ取得開始")
@@ -209,18 +211,17 @@ def load_market_history(period="5y"):
     # 全データを日付ベースで結合
     # ----------------------------------------
 
-    merged = None
+    merged = data["QQQ"].copy()
 
     for name, df in data.items():
 
-        if merged is None:
-            merged = df
+        if name == "QQQ":
+            continue
 
-        else:
-            merged = merged.join(
-                df,
-                how="outer"
-            )
+        merged = merged.join(
+            df,
+            how="left"
+        )
 
     # ----------------------------------------
     # 日付順に並べる
@@ -444,12 +445,12 @@ def run_backtest(period="5y"):
 
                 # 当日の市場データ
                 "qqq_change": round(
-                    (df["QQQ"].iloc[i] / df["QQQ"].iloc[i - 1] - 1) * 100,
+                    float(today["QQQ_change"]),
                     4
                 ),
 
                 "spy_change": round(
-                    (df["SPY"].iloc[i] / df["SPY"].iloc[i - 1] - 1) * 100,
+                    float(today["SPY_change"]),
                     4
                 ),
 
@@ -459,17 +460,17 @@ def run_backtest(period="5y"):
                 ),
 
                 "gold_change": round(
-                    (df["GLD"].iloc[i] / df["GLD"].iloc[i - 1] - 1) * 100,
+                    float(today["GLD_change"]),
                     4
                 ),
 
                 "tnx_change": round(
-                    (df["TNX"].iloc[i] / df["TNX"].iloc[i - 1] - 1) * 100,
+                    float(today["TNX_change"]),
                     4
                 ),
 
                 "usdjpy_change": round(
-                    (df["USDJPY"].iloc[i] / df["USDJPY"].iloc[i - 1] - 1) * 100,
+                    float(today["USDJPY_change"]),
                     4
                 ),
 
