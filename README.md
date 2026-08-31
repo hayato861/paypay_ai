@@ -29,3 +29,11 @@ python -m unittest discover -s tests -v
 - 有料公開判定: `python commercial_readiness.py`
 
 現在は無料ベータであり、有料公開判定がすべて通過するまで課金を開始しない。
+
+## タイムゾーンと収益化設定
+
+生成日時、履歴日付、採点基準日、ログはすべて日本標準時（Asia/Tokyo）を使う。
+
+有料版の先行案内URLは `PREMIUM_SIGNUP_URL` で設定する。無料版広告はAdSense審査通過後に
+`ADS_ENABLED=true`、`ADSENSE_CLIENT`、`ADSENSE_SLOT` の3項目を設定した場合だけ表示される。
+有料LINE通知にはbroadcastを使わず、契約状態を確認した会員ごとにpush APIを使用する。

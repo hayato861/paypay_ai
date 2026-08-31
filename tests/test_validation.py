@@ -1,7 +1,7 @@
 import unittest
 import csv
 import tempfile
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -11,10 +11,13 @@ from backtest import evaluate_next_day, load_market_history
 from grader import grade
 from market import clean_history
 from stats import get_stats
-from notify import notify
-from publisher import publish
+from notify import notify, notify_paid_member
+from publisher import publish, publish_premium
+from report import create_premium_report
 from x import create_x_post, save_x_draft
 from commercial_readiness import Check, report
+from clock import JST
+from service import adsense_html, premium_preview_html
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -222,6 +225,68 @@ class ValidationTest(unittest.TestCase):
     def test_line_notification_requires_token(self):
         with self.assertRaises(RuntimeError):
             notify("test message")
+
+    @patch("notify.requests.post")
+    @patch("notify.LINE_CHANNEL_ACCESS_TOKEN", "test-token")
+    def test_paid_line_notification_uses_individual_push_and_retry_key(self, post):
+        response = Mock(status_code=200)
+        post.return_value = response
+
+        notify_paid_member("premium report", "U123", "retry-key")
+
+        self.assertEqual(post.call_args.args[0], "https://api.line.me/v2/bot/message/push")
+        self.assertEqual(post.call_args.kwargs["json"]["to"], "U123")
+        self.assertEqual(
+            post.call_args.kwargs["headers"]["X-Line-Retry-Key"],
+            "retry-key",
+        )
+
+    @patch.dict("os.environ", {}, clear=True)
+    def test_ads_are_disabled_by_default(self):
+        self.assertEqual(adsense_html(), "")
+
+    @patch.dict(
+        "os.environ",
+        {
+            "ADS_ENABLED": "true",
+            "ADSENSE_CLIENT": "ca-pub-test",
+            "ADSENSE_SLOT": "12345",
+        },
+        clear=True,
+    )
+    def test_ads_require_explicit_configuration(self):
+        html = adsense_html()
+        self.assertIn('data-ad-client="ca-pub-test"', html)
+        self.assertIn('data-ad-slot="12345"', html)
+
+    @patch.dict("os.environ", {"PREMIUM_SIGNUP_URL": "https://example.com/waitlist?a=1&b=2"})
+    def test_premium_signup_url_is_escaped(self):
+        self.assertIn("a=1&amp;b=2", premium_preview_html())
+
+    def test_jst_timezone_has_expected_offset(self):
+        value = datetime(2026, 8, 31, 10, 0, tzinfo=JST)
+        self.assertEqual(value.utcoffset().total_seconds(), 9 * 60 * 60)
+
+    @patch("report.yesterday_diff", return_value=5)
+    @patch("report.average_score", return_value=62.5)
+    def test_premium_report_contains_trend_and_risk_analysis(self, average, delta):
+        text = create_premium_report(
+            {"vix": 30.0, "change": -2.5},
+            55,
+            ["金利上昇"],
+            [("ゴールド", 80)],
+            ["警戒感が上昇"],
+        )
+
+        self.assertIn("前日比 +5点", text)
+        self.assertIn("7日平均：62.5点", text)
+        self.assertIn("VIXが30.00", text)
+        self.assertIn("将来の成果を保証しません", text)
+
+    @patch("publisher.notify_paid_member")
+    def test_premium_publisher_uses_validated_individual_delivery(self, send):
+        publish_premium("report", "U123", "retry-key")
+        send.assert_called_once_with("report", "U123", "retry-key")
 
     @patch("x.get_stats")
     def test_x_draft_is_short_and_saved_for_manual_post(self, stats):

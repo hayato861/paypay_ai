@@ -1,6 +1,6 @@
 from image import create_market_image
 from logger import log
-from notify import notify
+from notify import notify, notify_paid_member
 from web import create_page
 from x import create_x_post, save_x_draft
 
@@ -66,3 +66,8 @@ def publish(report, data, market_score, ranking, reasons, insight):
 
     print("=" * 40)
     print("配信完了")
+
+
+def publish_premium(report, user_id, delivery_key):
+    """Deliver a prepared premium report to one validated subscriber."""
+    return notify_paid_member(report, user_id, delivery_key)

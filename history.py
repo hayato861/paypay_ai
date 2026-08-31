@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from datetime import datetime
+from clock import now_jst
 
 HISTORY_FIELDS = [
     "date",
@@ -46,7 +46,7 @@ def save_history(score, recommend):
 
     Path("data").mkdir(exist_ok=True)
     file = Path("data/history.csv")
-    today = datetime.now().strftime("%Y-%m-%d")
+    today = now_jst().strftime("%Y-%m-%d")
     ensure_history_schema(file)
 
     if file.exists():

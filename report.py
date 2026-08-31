@@ -1,4 +1,5 @@
 from stats import get_stats
+from history import average_score, yesterday_diff
 from service import GENERAL_DISCLAIMER, PERFORMANCE_DISCLAIMER
 
 def create_report(data, market_score, reasons, ranking, insight):
@@ -81,3 +82,36 @@ VIX      : {data['vix']:.2f}
     report += "🤖 Powered by PayPay AI"
 
     return report
+
+
+def create_premium_report(data, market_score, reasons, ranking, insight):
+    """Create the deeper report intended for an authenticated paid channel."""
+    delta = yesterday_diff()
+    average = average_score(7)
+    delta_text = "データ不足" if delta is None else f"{delta:+}点"
+    average_text = "データ不足" if average is None else f"{average:.1f}点"
+    risk_flags = []
+    if data["vix"] >= 25:
+        risk_flags.append(f"VIXが{data['vix']:.2f}と高く、値動きの拡大に注意")
+    if abs(data["change"]) >= 2:
+        risk_flags.append(f"QQQの日次変動が{data['change']:+.2f}%と大きい")
+    if not risk_flags:
+        risk_flags.append("主要指標に設定済みの強い警戒条件はありません")
+
+    lines = [
+        "🔐 PayPay AI Premium Analysis",
+        "",
+        f"市場スコア：{market_score}点（前日比 {delta_text}）",
+        f"7日平均：{average_text}",
+        f"最上位：{ranking[0][0]}（{ranking[0][1]}点）",
+        "",
+        "【変化点・背景】",
+        *[f"・{item}" for item in (reasons + insight)],
+        "",
+        "【リスク監視】",
+        *[f"・{item}" for item in risk_flags],
+        "",
+        GENERAL_DISCLAIMER,
+        PERFORMANCE_DISCLAIMER,
+    ]
+    return "\n".join(lines)

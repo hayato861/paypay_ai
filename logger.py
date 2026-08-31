@@ -1,11 +1,12 @@
-from datetime import datetime
 from pathlib import Path
+
+from clock import now_jst
 
 def log(message):
     
     Path("logs").mkdir(exist_ok=True)
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = now_jst().strftime("%Y-%m-%d %H:%M:%S JST")
 
     with open("logs/system.log","a",encoding="utf-8") as f:
 

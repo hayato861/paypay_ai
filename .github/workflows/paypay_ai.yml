@@ -50,6 +50,11 @@ jobs:
           X_API_KEY: ${{ secrets.X_API_KEY }}
           X_API_SECRET: ${{ secrets.X_API_SECRET }}
           X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          SERVICE_STAGE: ${{ vars.SERVICE_STAGE }}
+          PREMIUM_SIGNUP_URL: ${{ vars.PREMIUM_SIGNUP_URL }}
+          ADS_ENABLED: ${{ vars.ADS_ENABLED }}
+          ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
+          ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
         run: |
           python main.py
 

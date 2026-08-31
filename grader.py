@@ -1,12 +1,13 @@
 import csv
 from pathlib import Path
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 import pandas as pd
 import yfinance as yf
 
 from courses import COURSE_TICKERS
 from history import HISTORY_FIELDS, ensure_history_schema
+from clock import now_jst
 
 
 def load_course_returns(ticker, start_date, end_date):
@@ -42,7 +43,7 @@ def grade(today=None, file=Path("data/history.csv")):
     ensure_history_schema(file)
 
     rows = []
-    today = today or datetime.now().date()
+    today = today or now_jst().date()
 
     with open(file, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)

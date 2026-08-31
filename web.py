@@ -1,14 +1,16 @@
 from pathlib import Path
-from datetime import datetime
 from html import escape
 
 from stats import get_stats
+from clock import now_jst
 
 from history import recent_history
 from validation import evaluate_backtest, evaluate_ml, passes_adoption_gate
 from service import (
+    adsense_html,
     GENERAL_DISCLAIMER,
     PERFORMANCE_DISCLAIMER,
+    premium_preview_html,
     service_stage_label,
 )
 import json
@@ -68,7 +70,7 @@ def create_page(
     else:
         market_text = "🔴 弱気相場"
 
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+    now = now_jst().strftime("%Y-%m-%d %H:%M JST")
 
     history = recent_history()
     
@@ -398,6 +400,10 @@ def create_page(
             REJECTは本番推薦への未採用を意味します。バックテスト結果は将来の成果を保証しません。
         </p>
     </div>
+
+    {premium_preview_html()}
+
+    {adsense_html()}
 
 
     <div class="grid2">
