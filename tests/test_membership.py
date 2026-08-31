@@ -71,6 +71,15 @@ class MembershipTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("PRIVATE REPORT", response.get_data(as_text=True))
 
+    def test_active_member_sees_clear_message_before_report_generation(self):
+        self.login()
+        member = store.get_or_create_member("member@example.com")
+        store.set_customer(member["id"], "cus_test")
+        store.update_subscription("cus_test", "active")
+        response = self.client.get("/members/report")
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("レポート準備中", response.get_data(as_text=True))
+
     @patch("member_app.stripe.Webhook.construct_event")
     def test_signed_webhook_updates_and_is_idempotent(self, construct):
         member = store.get_or_create_member("member@example.com")

@@ -214,7 +214,10 @@ def create_app(test_config=None):
             abort(403)
         report_path = Path(os.getenv("PREMIUM_REPORT_OUTPUT", "data/private/premium_report.html"))
         if not report_path.exists():
-            abort(503)
+            return _page(
+                "レポート準備中",
+                "<p>本日の会員レポートはまだ生成されていません。しばらくしてから再読み込みしてください。</p>",
+            ), 503
         return report_path.read_text(encoding="utf-8")
 
     return app

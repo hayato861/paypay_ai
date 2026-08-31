@@ -46,6 +46,12 @@ python -m unittest discover -s tests -v
 実際の会員レポートHTMLは毎回 `data/private/premium_report.html` に生成される。このファイルは
 公開リポジトリへコミットせず、本番では認証付きWebアプリからのみ配信する。
 
+LINEやXへ配信せず、会員レポートだけを生成する場合:
+
+```bash
+python3 generate_premium_report.py
+```
+
 ## 会員認証・Stripeテスト
 
 詳細手順: `docs/STRIPE_TEST_SETUP.md`
