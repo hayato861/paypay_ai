@@ -12,6 +12,7 @@ from service import (
     PERFORMANCE_DISCLAIMER,
     premium_preview_html,
     service_stage_label,
+    write_ads_txt,
 )
 import json
 
@@ -555,6 +556,7 @@ def create_page(
         html,
         encoding="utf-8"
     )
+    write_ads_txt()
 
     print("保存先:", output.resolve())
     

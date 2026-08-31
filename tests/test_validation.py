@@ -18,6 +18,8 @@ from x import create_x_post, save_x_draft
 from commercial_readiness import Check, report
 from clock import JST
 from service import adsense_html, premium_preview_html
+from service import write_ads_txt
+from premium_web import create_premium_page
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -249,8 +251,10 @@ class ValidationTest(unittest.TestCase):
         "os.environ",
         {
             "ADS_ENABLED": "true",
+            "ADS_CONSENT_READY": "true",
             "ADSENSE_CLIENT": "ca-pub-test",
             "ADSENSE_SLOT": "12345",
+            "PRIVACY_URL": "https://example.com/privacy?a=1&b=2",
         },
         clear=True,
     )
@@ -258,10 +262,36 @@ class ValidationTest(unittest.TestCase):
         html = adsense_html()
         self.assertIn('data-ad-client="ca-pub-test"', html)
         self.assertIn('data-ad-slot="12345"', html)
+        self.assertIn("privacy?a=1&amp;b=2", html)
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "ads.txt"
+            self.assertEqual(write_ads_txt(output), output)
+            self.assertEqual(
+                output.read_text(encoding="utf-8"),
+                "google.com, pub-test, DIRECT, f08c47fec0942fa0\n",
+            )
 
     @patch.dict("os.environ", {"PREMIUM_SIGNUP_URL": "https://example.com/waitlist?a=1&b=2"})
     def test_premium_signup_url_is_escaped(self):
         self.assertIn("a=1&amp;b=2", premium_preview_html())
+
+    @patch.dict(
+        "os.environ",
+        {
+            "PAID_LAUNCH_ENABLED": "true",
+            "LEGAL_REVIEW_APPROVED": "false",
+            "STRIPE_CHECKOUT_URL": "https://checkout.example/session",
+        },
+        clear=True,
+    )
+    def test_premium_page_does_not_sell_before_legal_approval(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "premium.html"
+            create_premium_page(output)
+            html = output.read_text(encoding="utf-8")
+        self.assertIn("準備中・課金未開始", html)
+        self.assertNotIn("checkout.example", html)
 
     def test_jst_timezone_has_expected_offset(self):
         value = datetime(2026, 8, 31, 10, 0, tzinfo=JST)
@@ -334,12 +364,14 @@ class ValidationTest(unittest.TestCase):
     @patch("publisher.create_x_post", return_value="x draft")
     @patch("publisher.create_market_image", return_value=Path("data/market_report.png"))
     @patch("publisher.notify")
+    @patch("publisher.create_premium_page")
     @patch("publisher.create_page")
     @patch("publisher.log")
     def test_publish_sends_line_but_only_saves_x_draft(
         self,
         log,
         create_page,
+        create_premium,
         line_notify,
         create_image,
         create_post,
@@ -351,6 +383,7 @@ class ValidationTest(unittest.TestCase):
         publish("line report", data, 60, ranking, [], [])
 
         line_notify.assert_called_once_with("line report")
+        create_premium.assert_called_once_with()
         create_image.assert_called_once()
         create_post.assert_called_once_with(data, 60, ranking, [])
         save_draft.assert_called_once_with(

@@ -28,6 +28,16 @@ def run_checks():
         Check("privacy_url", env_present("PRIVACY_URL"), "プライバシーポリシーURLが必要"),
         Check("support_email", env_present("SUPPORT_EMAIL"), "問い合わせ窓口が必要"),
         Check(
+            "paid_launch_switch",
+            os.getenv("PAID_LAUNCH_ENABLED", "").lower() == "true",
+            "正式公開時だけ明示的に有効化する",
+        ),
+        Check(
+            "checkout_url",
+            env_present("STRIPE_CHECKOUT_URL"),
+            "Stripe Checkout URLが必要",
+        ),
+        Check(
             "stripe_configuration",
             all(
                 env_present(name)

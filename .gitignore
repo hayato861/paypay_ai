@@ -10,4 +10,8 @@ config_local.py
 
 logs/
 
+# 有料分析本文・会員情報は公開リポジトリへ保存しない
+data/private/
+data/members*
+
 .venv/

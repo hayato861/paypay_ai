@@ -1,5 +1,6 @@
 import os
 from html import escape
+from pathlib import Path
 
 
 SERVICE_STAGE = os.getenv("SERVICE_STAGE", "").strip() or "beta"
@@ -31,13 +32,11 @@ def env_enabled(name):
 
 def premium_preview_html():
     signup_url = os.getenv("PREMIUM_SIGNUP_URL", "").strip()
-    if signup_url:
-        action = (
-            f'<a class="premium-button" href="{escape(signup_url, quote=True)}">'
-            "先行案内に登録</a>"
-        )
-    else:
-        action = '<span class="premium-status">準備中・課金未開始</span>'
+    destination = signup_url or "premium.html"
+    action = (
+        f'<a class="premium-button" href="{escape(destination, quote=True)}">'
+        "詳しく見る</a>"
+    )
 
     return f"""
     <section class="card premium-card" aria-labelledby="premium-title">
@@ -53,7 +52,12 @@ def premium_preview_html():
 
 
 def adsense_html():
-    if not env_enabled("ADS_ENABLED"):
+    privacy_url = os.getenv("PRIVACY_URL", "").strip()
+    if not (
+        env_enabled("ADS_ENABLED")
+        and env_enabled("ADS_CONSENT_READY")
+        and privacy_url
+    ):
         return ""
 
     client = os.getenv("ADSENSE_CLIENT", "").strip()
@@ -71,7 +75,23 @@ def adsense_html():
              data-ad-slot="{safe_slot}"
              data-ad-format="auto" data-full-width-responsive="true"></ins>
         <script>(adsbygoogle = window.adsbygoogle || []).push({{}});</script>
+        <a class="ad-privacy" href="{escape(privacy_url, quote=True)}">広告とプライバシーについて</a>
     </aside>
     <script async crossorigin="anonymous"
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={safe_client}"></script>
     """
+
+
+def write_ads_txt(output=Path("ads.txt")):
+    if not (env_enabled("ADS_ENABLED") and env_enabled("ADS_CONSENT_READY")):
+        return None
+    client = os.getenv("ADSENSE_CLIENT", "").strip()
+    if not client.startswith("ca-pub-"):
+        return None
+    publisher_id = client.removeprefix("ca-")
+    output = Path(output)
+    output.write_text(
+        f"google.com, {publisher_id}, DIRECT, f08c47fec0942fa0\n",
+        encoding="utf-8",
+    )
+    return output

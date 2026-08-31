@@ -53,8 +53,15 @@ jobs:
           SERVICE_STAGE: ${{ vars.SERVICE_STAGE }}
           PREMIUM_SIGNUP_URL: ${{ vars.PREMIUM_SIGNUP_URL }}
           ADS_ENABLED: ${{ vars.ADS_ENABLED }}
+          ADS_CONSENT_READY: ${{ vars.ADS_CONSENT_READY }}
           ADSENSE_CLIENT: ${{ vars.ADSENSE_CLIENT }}
           ADSENSE_SLOT: ${{ vars.ADSENSE_SLOT }}
+          PREMIUM_PRICE_LABEL: ${{ vars.PREMIUM_PRICE_LABEL }}
+          PAID_LAUNCH_ENABLED: ${{ vars.PAID_LAUNCH_ENABLED }}
+          LEGAL_REVIEW_APPROVED: ${{ vars.LEGAL_REVIEW_APPROVED }}
+          STRIPE_CHECKOUT_URL: ${{ vars.STRIPE_CHECKOUT_URL }}
+          TERMS_URL: ${{ vars.TERMS_URL }}
+          PRIVACY_URL: ${{ vars.PRIVACY_URL }}
         run: |
           python main.py
 
@@ -66,9 +73,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add index.html
+          git add premium.html
           git add data/history.csv
           git add data/market_report.png
           git add data/x_post.txt
+
+          if [ -f ads.txt ]; then
+            git add ads.txt
+          fi
 
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
