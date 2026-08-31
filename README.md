@@ -45,3 +45,22 @@ python -m unittest discover -s tests -v
 
 実際の会員レポートHTMLは毎回 `data/private/premium_report.html` に生成される。このファイルは
 公開リポジトリへコミットせず、本番では認証付きWebアプリからのみ配信する。
+
+## 会員認証・Stripeテスト
+
+`member_app.py` はメールのワンタイムリンク認証、Stripe Checkout、署名検証済みWebhook、
+Customer Portal、契約中会員だけのレポート表示を提供する。初期段階では必ずStripeテストキーを使う。
+
+```bash
+export SERVICE_STAGE=development
+export MEMBER_SESSION_SECRET='開発用の十分長いランダム値'
+export STRIPE_SECRET_KEY='sk_test_...'
+export STRIPE_PRICE_ID='price_...'
+export STRIPE_WEBHOOK_SECRET='whsec_...'
+export MAGIC_LINK_DELIVERY=console
+python3 member_app.py
+```
+
+Stripe CLIでローカルWebhookを転送する場合の受信先は
+`http://127.0.0.1:8000/stripe/webhook`。ログインは `/login`、マイページは `/account`。
+本番では `MAGIC_LINK_DELIVERY=smtp` とSMTP設定を使用し、`ALLOW_STRIPE_LIVE=true` は法務・公開判定後のみ設定する。

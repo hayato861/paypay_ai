@@ -38,6 +38,16 @@ def run_checks():
             "Stripe Checkout URLが必要",
         ),
         Check(
+            "member_session_secret",
+            env_present("MEMBER_SESSION_SECRET"),
+            "推測困難な会員セッション署名鍵が必要",
+        ),
+        Check(
+            "production_email_delivery",
+            os.getenv("MAGIC_LINK_DELIVERY") == "smtp",
+            "本番ログインリンクはconsoleではなくSMTP配信が必要",
+        ),
+        Check(
             "stripe_configuration",
             all(
                 env_present(name)

@@ -410,3 +410,10 @@ table tr:hover{
     .premium-hero{padding:36px 20px;}
     .premium-hero h1{font-size:30px;}
 }
+
+.member-auth{max-width:620px;padding-top:70px;}
+.member-auth input[type="email"]{
+    width:100%;margin:12px 0 18px;padding:13px 15px;border:1px solid #475569;
+    border-radius:10px;background:#0f172a;color:#fff;font-size:16px;
+}
+.member-auth button{border:0;cursor:pointer;font-size:15px;}

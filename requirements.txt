@@ -6,4 +6,6 @@ openai
 python-dotenv
 beautifulsoup4
 Pillow
+Flask>=3.0,<4
+stripe>=11,<14
 Pillow
