@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 import member_store as store
 from member_app import create_app
 from stripe_test_setup import create_test_product
+from membership_config_check import checks as membership_checks
 
 
 class MembershipTest(unittest.TestCase):
@@ -104,6 +105,19 @@ class MembershipTest(unittest.TestCase):
         response = self.client.get("/healthz")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "ok")
+
+    def test_membership_configuration_can_be_checked_without_printing_secrets(self):
+        with patch.dict(os.environ, {
+            "MEMBER_SESSION_SECRET": "x" * 48,
+            "STRIPE_SECRET_KEY": "sk_test_hidden",
+            "STRIPE_PRICE_ID": "price_test",
+            "STRIPE_WEBHOOK_SECRET": "whsec_test",
+            "MEMBER_DB_PATH": str(Path(self.directory.name) / "members.db"),
+            "SERVICE_STAGE": "development",
+        }, clear=True):
+            result = membership_checks()
+        self.assertTrue(all(passed for _, passed, _ in result))
+        self.assertNotIn("sk_test_hidden", repr(result))
 
 
 if __name__ == "__main__":

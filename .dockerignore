@@ -1,0 +1,9 @@
+.git
+.env
+config_local.py
+data/members*
+data/private
+logs
+__pycache__
+*.pyc
+

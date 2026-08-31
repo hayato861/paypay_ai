@@ -12,8 +12,11 @@ from pathlib import Path
 import stripe
 from stripe._error import SignatureVerificationError
 from flask import Flask, abort, redirect, request, send_from_directory, session
+from dotenv import load_dotenv
 
 import member_store as store
+
+load_dotenv()
 
 
 def _required(name):

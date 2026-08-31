@@ -48,6 +48,8 @@ python -m unittest discover -s tests -v
 
 ## 会員認証・Stripeテスト
 
+詳細手順: `docs/STRIPE_TEST_SETUP.md`
+
 `member_app.py` はメールのワンタイムリンク認証、Stripe Checkout、署名検証済みWebhook、
 Customer Portal、契約中会員だけのレポート表示を提供する。初期段階では必ずStripeテストキーを使う。
 
