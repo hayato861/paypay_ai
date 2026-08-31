@@ -126,7 +126,7 @@ def recommend_courses(data, market_score):
         "チャレンジ": 80,
         "スタンダード": 80,
         "ゴールド": 80,
-        "アメリカ長期国債チャレンジ": 80,
+        "アメリカ超長期国債チャレンジ": 80,
         "逆チャレンジ": 80,
     }
 
@@ -159,7 +159,7 @@ def recommend_courses(data, market_score):
     elif market_score <= 40:
 
         courses["ゴールド"] += 12
-        courses["アメリカ長期国債チャレンジ"] += 10
+        courses["アメリカ超長期国債チャレンジ"] += 10
         courses["逆チャレンジ"] += 8
 
     # ========================================
@@ -195,7 +195,7 @@ def recommend_courses(data, market_score):
     elif data["vix"] > 25:
 
         courses["ゴールド"] += 10
-        courses["アメリカ長期国債チャレンジ"] += 8
+        courses["アメリカ超長期国債チャレンジ"] += 8
 
     # 100点上限
     for course in courses:

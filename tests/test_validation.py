@@ -1,9 +1,14 @@
 import unittest
+import csv
+import tempfile
+from datetime import date
+from pathlib import Path
 from unittest.mock import patch
 
 import pandas as pd
 
-from backtest import load_market_history
+from backtest import evaluate_next_day, load_market_history
+from grader import grade
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -53,6 +58,11 @@ class ValidationTest(unittest.TestCase):
                 "2026-01-03",
                 "2026-01-05",
             ]),
+            "TQQQ": pd.to_datetime(["2026-01-02", "2026-01-05"]),
+            "SQQQ": pd.to_datetime(["2026-01-02", "2026-01-05"]),
+            "SPXL": pd.to_datetime(["2026-01-02", "2026-01-05"]),
+            "SPXS": pd.to_datetime(["2026-01-02", "2026-01-05"]),
+            "TMF": pd.to_datetime(["2026-01-02", "2026-01-05"]),
         }
 
         def history_for(symbol):
@@ -71,6 +81,61 @@ class ValidationTest(unittest.TestCase):
             result.index.tolist(),
             indexes["QQQ"].tolist(),
         )
+
+    def test_next_day_uses_recommended_course_etf(self):
+        today = pd.Series({"QQQ": 100.0, "TQQQ": 100.0})
+        tomorrow = pd.Series({"QQQ": 99.0, "TQQQ": 103.0})
+
+        change, result = evaluate_next_day(
+            today,
+            tomorrow,
+            "テクノロジーチャレンジ",
+        )
+
+        self.assertAlmostEqual(change, 3.0)
+        self.assertEqual(result, "Win")
+
+    @patch("grader.load_course_returns")
+    def test_grader_uses_real_course_return_and_keeps_future_pending(self, load):
+        load.side_effect = lambda ticker, start, end: pd.Series(
+            [3.0 if ticker == "TQQQ" else -2.0],
+            index=pd.to_datetime(["2026-08-28"]),
+        )
+
+        with tempfile.TemporaryDirectory() as directory:
+            history = Path(directory) / "history.csv"
+            with history.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(
+                    stream,
+                    fieldnames=["date", "score", "recommend", "qqq_change", "result"],
+                )
+                writer.writeheader()
+                writer.writerows([
+                    {
+                        "date": "2026-08-28",
+                        "score": "70",
+                        "recommend": "テクノロジーチャレンジ",
+                        "qqq_change": "",
+                        "result": "Pending",
+                    },
+                    {
+                        "date": "2026-08-30",
+                        "score": "60",
+                        "recommend": "逆チャレンジ",
+                        "qqq_change": "",
+                        "result": "Pending",
+                    },
+                ])
+
+            grade(today=date(2026, 8, 31), file=history)
+
+            with history.open(newline="", encoding="utf-8") as stream:
+                rows = list(csv.DictReader(stream))
+
+        self.assertEqual(rows[0]["qqq_change"], "3.00")
+        self.assertEqual(rows[0]["result"], "Win")
+        self.assertEqual(rows[1]["qqq_change"], "")
+        self.assertEqual(rows[1]["result"], "Pending")
 
 
 if __name__ == "__main__":

@@ -62,23 +62,35 @@ def passes_adoption_gate(
 
 def evaluate_backtest(path=Path("data/backtest.csv"), test_fraction=0.2):
     df = pd.read_csv(path)
-    required = {"date", "recommend", "next_day_qqq"}
+    required = {"date", "recommend", "next_day_course", "next_day_qqq"}
     missing = required.difference(df.columns)
 
     if missing:
         raise ValueError(f"backtest列不足: {sorted(missing)}")
 
     df["date"] = pd.to_datetime(df["date"])
+    df["next_day_course"] = pd.to_numeric(
+        df["next_day_course"],
+        errors="coerce",
+    )
     df["next_day_qqq"] = pd.to_numeric(df["next_day_qqq"], errors="coerce")
-    df = df.dropna(subset=["date", "recommend", "next_day_qqq"])
-    df = df[df["next_day_qqq"] != 0].sort_values("date").reset_index(drop=True)
+    df = df.dropna(
+        subset=["date", "recommend", "next_day_course", "next_day_qqq"]
+    )
+    df = df[df["next_day_course"] != 0].sort_values("date").reset_index(drop=True)
 
     split = int(len(df) * (1 - test_fraction))
     test = df.iloc[split:].copy()
-    actual = (test["next_day_qqq"] > 0).astype(int)
-    prediction = recommendation_prediction(test["recommend"])
+    # 推薦ETFの上昇率を、固定QQQの上昇率と比較する。
+    accuracy = float((test["next_day_course"] > 0).mean())
+    baseline = float((test["next_day_qqq"] > 0).mean())
 
-    return evaluate_predictions(actual, prediction)
+    return {
+        "samples": len(test),
+        "accuracy": accuracy,
+        "baseline": baseline,
+        "edge": accuracy - baseline,
+    }
 
 
 def evaluate_ml(path, probability_column=None):

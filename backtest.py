@@ -2,6 +2,7 @@ import yfinance as yf
 import pandas as pd
 from pathlib import Path
 import numpy as np
+from courses import COURSE_TICKERS
 from scoring import score_market, recommend_courses
 
 # ============================================================
@@ -163,8 +164,12 @@ TICKERS = {
     "GLD": "GLD",
     "TNX": "^TNX",
     "USDJPY": "JPY=X",
+    "TQQQ": "TQQQ",
+    "SQQQ": "SQQQ",
+    "SPXL": "SPXL",
+    "SPXS": "SPXS",
+    "TMF": "TMF",
 }
-
 
 def load_market_history(period="5y"):
     """
@@ -348,44 +353,21 @@ def evaluate_next_day(
     recommendation
 ):
     """
-    今日のおすすめが翌日のQQQの値動きに対して
-    良かったかどうかを判定する。
+    推薦コースが連動するETFの翌日リターンを評価する。
     """
 
+    ticker = COURSE_TICKERS.get(recommendation)
+
+    if ticker is None:
+        return float("nan"), "Pending"
+
     change = (
-        (tomorrow["QQQ"] - today["QQQ"])
-        / today["QQQ"]
+        (tomorrow[ticker] - today[ticker])
+        / today[ticker]
         * 100
     )
 
-    # 現時点では簡易評価
-    #
-    # 上昇 → 通常の強気系がおおむね有利
-    # 下落 → 逆チャレンジ・ゴールド等が有利
-    #
-    # 後でrecommend_courses()に合わせて
-    # 正式な判定ロジックに変更する。
-
-    if recommendation in [
-        "テクノロジー",
-        "テクノロジーチャレンジ",
-        "チャレンジ",
-        "スタンダード",
-    ]:
-
-        result = "Win" if change > 0 else "Lose"
-
-    elif recommendation in [
-        "逆チャレンジ",
-        "ゴールド",
-        "アメリカ長期国債チャレンジ",
-    ]:
-
-        result = "Win" if change < 0 else "Lose"
-
-    else:
-
-        result = "Pending"
+    result = "Win" if change > 0 else "Lose"
 
     return change, result
 
@@ -479,6 +461,16 @@ def run_backtest(period="5y"):
 
                 # 翌日のQQQ
                 "next_day_qqq": round(
+                    (
+                        (tomorrow["QQQ"] - today["QQQ"])
+                        / today["QQQ"]
+                        * 100
+                    ),
+                    2
+                ),
+
+                # 推薦コースが連動するETFの翌日リターン
+                "next_day_course": round(
                     next_change,
                     2
                 ),
