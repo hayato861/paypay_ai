@@ -22,7 +22,7 @@
                 </div>
                 
                 <div class="small">
-                    更新日時：2026-08-30 21:39
+                    更新日時：2026-08-31 09:56
                 </div>
             </div>
             
@@ -58,31 +58,45 @@
                 <!-- AI実績 -->
                 <div class="card">
                     <div class="small">
-                        <h2>AI実績</h2>
+                        <h2>検証済み実績</h2>
                     </div>
     <div class="stats-grid">
 
         <div class="stat-box">
-            <div class="stat-title">勝率</div>
-            <div class="stat-value">100.0%</div>
+            <div class="stat-title">実ETF勝率</div>
+            <div class="stat-value">50.0%</div>
         </div>
 
         <div class="stat-box">
-            <div class="stat-title">予想</div>
-            <div class="stat-value">23</div>
+            <div class="stat-title">評価済み</div>
+            <div class="stat-value">2</div>
         </div>
 
         <div class="stat-box">
             <div class="stat-title">勝ち</div>
-            <div class="stat-value">19</div>
+            <div class="stat-value">1</div>
         </div>
 
         <div class="stat-box">
             <div class="stat-title">負け</div>
-            <div class="stat-value">0</div>
+            <div class="stat-value">1</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-title">判定待ち</div>
+            <div class="stat-value">2</div>
+        </div>
+
+        <div class="stat-box legacy-stat">
+            <div class="stat-title">旧方式（参考）</div>
+            <div class="stat-value">19</div>
         </div>
 
     </div>
+    <p class="data-note">
+        勝率は実際の連動ETFで採点できた予想だけを集計しています。<br>
+        旧方式の記録は勝率に含めません。
+    </p>
 </div>
 </div>
 
@@ -112,35 +126,95 @@
 
         <div class="card">
             <h2>🕒 最近のおすすめ</h2>
+            <div class="table-scroll">
             <table>
+                <thead>
+                    <tr><th>日付</th><th>コース</th><th>結果</th><th>実ETF</th></tr>
+                </thead>
+                <tbody>
                 
     <tr>
     <td>08-30</td>
     <td>テクノロジーチャレンジ</td>
+    <td>⏳ 判定待ち</td>
+    <td>—</td>
     </tr>
     
     <tr>
     <td>08-28</td>
     <td>テクノロジーチャレンジ</td>
+    <td>⏳ 判定待ち</td>
+    <td>—</td>
     </tr>
     
     <tr>
     <td>08-27</td>
     <td>テクノロジーチャレンジ</td>
+    <td>参考（旧方式）</td>
+    <td>—</td>
     </tr>
     
     <tr>
     <td>08-26</td>
     <td>テクノロジーチャレンジ</td>
+    <td>参考（旧方式）</td>
+    <td>—</td>
     </tr>
     
     <tr>
     <td>08-10</td>
     <td>テクノロジーチャレンジ</td>
+    <td>❌ Lose</td>
+    <td>-0.90%</td>
     </tr>
     
+                </tbody>
             </table>
+            </div>
         </div>
+    </div>
+
+    <div class="card validation-card">
+        <h2>🧪 モデル検証</h2>
+        <p class="data-note">
+            時系列テスト期間で単純基準と比較。200件以上かつ基準を2ポイント以上上回る場合のみ採用します。
+        </p>
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>モデル</th><th>件数</th><th>精度</th><th>基準</th><th>差</th><th>判定</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td>現行コース判定</td>
+                <td>235</td>
+                <td>49.4%</td>
+                <td>53.6%</td>
+                <td>-4.3%</td>
+                <td><span class="status-badge reject">REJECT</span></td>
+            </tr><tr>
+                <td>ML v1</td>
+                <td>236</td>
+                <td>51.3%</td>
+                <td>55.5%</td>
+                <td>-4.2%</td>
+                <td><span class="status-badge reject">REJECT</span></td>
+            </tr><tr>
+                <td>ML v2</td>
+                <td>242</td>
+                <td>48.3%</td>
+                <td>56.2%</td>
+                <td>-7.9%</td>
+                <td><span class="status-badge reject">REJECT</span></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="data-note">
+            REJECTは本番推薦への未採用を意味します。バックテスト結果は将来の成果を保証しません。
+        </p>
     </div>
 
 
@@ -176,7 +250,7 @@
 
                 <tr>
                     <td>ドル円</td>
-                    <td>160.04</td>
+                    <td>159.96</td>
                 </tr>
 
                 <tr>
@@ -239,7 +313,7 @@
         
         <tr>
             <td>6.</td>
-            <td>アメリカ長期国債チャレンジ</td>
+            <td>アメリカ超長期国債チャレンジ</td>
             <td>80点</td>
         </tr>
         

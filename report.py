@@ -3,6 +3,7 @@ from stats import get_stats
 def create_report(data, market_score, reasons, ranking, insight):
 
     stats = get_stats()
+    win_rate = "—" if stats["win_rate"] is None else f'{stats["win_rate"]}%'
 
     # 星評価
     if market_score >= 85:
@@ -25,11 +26,12 @@ def create_report(data, market_score, reasons, ranking, insight):
 
 📊 AI実績
 
-予想回数：{stats['total']}回
+検証済み：{stats['verified_total']}回
 勝ち：{stats['win']}回
 負け：{stats['lose']}回
 保留：{stats['pending']}回
-勝率：{stats['win_rate']}%
+旧方式（参考）：{stats['legacy']}回
+実ETF勝率：{win_rate}
 
 ━━━━━━━━━━━━━━
 

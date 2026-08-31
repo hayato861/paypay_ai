@@ -9,6 +9,7 @@ import pandas as pd
 
 from backtest import evaluate_next_day, load_market_history
 from grader import grade
+from stats import get_stats
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -136,6 +137,65 @@ class ValidationTest(unittest.TestCase):
         self.assertEqual(rows[0]["result"], "Win")
         self.assertEqual(rows[1]["qqq_change"], "")
         self.assertEqual(rows[1]["result"], "Pending")
+
+    def test_stats_excludes_legacy_results_from_verified_rate(self):
+        with tempfile.TemporaryDirectory() as directory:
+            history = Path(directory) / "history.csv"
+            with history.open("w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(
+                    stream,
+                    fieldnames=[
+                        "date",
+                        "score",
+                        "recommend",
+                        "qqq_change",
+                        "result",
+                        "evaluation_source",
+                    ],
+                    lineterminator="\n",
+                )
+                writer.writeheader()
+                writer.writerows([
+                    {
+                        "date": "2026-08-26",
+                        "score": "50",
+                        "recommend": "テクノロジー",
+                        "qqq_change": "1.20",
+                        "result": "Win",
+                        "evaluation_source": "legacy",
+                    },
+                    {
+                        "date": "2026-08-27",
+                        "score": "70",
+                        "recommend": "テクノロジー",
+                        "qqq_change": "0.50",
+                        "result": "Win",
+                        "evaluation_source": "etf_v1",
+                    },
+                    {
+                        "date": "2026-08-28",
+                        "score": "60",
+                        "recommend": "テクノロジー",
+                        "qqq_change": "-0.50",
+                        "result": "Lose",
+                        "evaluation_source": "etf_v1",
+                    },
+                    {
+                        "date": "2026-08-29",
+                        "score": "60",
+                        "recommend": "テクノロジー",
+                        "qqq_change": "",
+                        "result": "Pending",
+                        "evaluation_source": "",
+                    },
+                ])
+
+            stats = get_stats(history)
+
+        self.assertEqual(stats["verified_total"], 2)
+        self.assertEqual(stats["win_rate"], 50.0)
+        self.assertEqual(stats["legacy"], 1)
+        self.assertEqual(stats["pending"], 1)
 
 
 if __name__ == "__main__":

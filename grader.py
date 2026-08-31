@@ -6,6 +6,7 @@ import pandas as pd
 import yfinance as yf
 
 from courses import COURSE_TICKERS
+from history import HISTORY_FIELDS, ensure_history_schema
 
 
 def load_course_returns(ticker, start_date, end_date):
@@ -37,6 +38,8 @@ def grade(today=None, file=Path("data/history.csv")):
 
     if not file.exists():
         return
+
+    ensure_history_schema(file)
 
     rows = []
     today = today or datetime.now().date()
@@ -77,18 +80,14 @@ def grade(today=None, file=Path("data/history.csv")):
             # 保存値は推薦コース連動ETFの実リターン。
             row["qqq_change"] = f"{change:.2f}"
             row["result"] = "Win" if change > 0 else "Lose"
+            row["evaluation_source"] = "etf_v1"
 
     with open(file, "w", newline="", encoding="utf-8") as f:
 
         writer = csv.DictWriter(
             f,
-            fieldnames=[
-                "date",
-                "score",
-                "recommend",
-                "qqq_change",
-                "result"
-            ]
+            fieldnames=HISTORY_FIELDS,
+            lineterminator="\n",
         )
 
         writer.writeheader()

@@ -230,3 +230,57 @@ table tr:hover{
     font-weight:bold;
     margin-top:5px;
 }
+
+.legacy-stat{
+    border:1px solid #64748b;
+    opacity:.8;
+}
+
+.data-note{
+    color:#94a3b8;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.table-scroll{
+    overflow-x:auto;
+}
+
+.validation-card table,
+.card table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.validation-card th,
+.validation-card td,
+.card th,
+.card td{
+    padding:10px 8px;
+    text-align:left;
+    border-bottom:1px solid #334155;
+    white-space:nowrap;
+}
+
+.status-badge{
+    display:inline-block;
+    padding:4px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.status-badge.adopt{
+    color:#86efac;
+    background:rgba(34,197,94,.15);
+}
+
+.status-badge.reject{
+    color:#fca5a5;
+    background:rgba(239,68,68,.15);
+}
+
+.status-badge.pending{
+    color:#fde68a;
+    background:rgba(250,204,21,.15);
+}

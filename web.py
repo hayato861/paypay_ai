@@ -1,9 +1,11 @@
 from pathlib import Path
 from datetime import datetime
+from html import escape
 
 from stats import get_stats
 
 from history import recent_history
+from validation import evaluate_backtest, evaluate_ml, passes_adoption_gate
 import json
 
 import requests
@@ -17,6 +19,9 @@ def create_page(
 ):
 
     stats = get_stats()
+    win_rate_text = (
+        "—" if stats["win_rate"] is None else f'{stats["win_rate"]}%'
+    )
     
     comment = ""
 
@@ -81,10 +86,26 @@ def create_page(
     recommend_html = ""
 
     for row in reversed(history[-5:]):
+        result = row.get("result", "Pending")
+        source = row.get("evaluation_source", "")
+        change = row.get("qqq_change", "")
+
+        if source == "etf_v1" and result in {"Win", "Lose"}:
+            result_text = "✅ Win" if result == "Win" else "❌ Lose"
+            return_text = f"{float(change):+.2f}%" if change else "—"
+        elif result == "Pending":
+            result_text = "⏳ 判定待ち"
+            return_text = "—"
+        else:
+            result_text = "参考（旧方式）"
+            return_text = "—"
+
         recommend_html += f"""
     <tr>
-    <td>{row['date'][5:]}</td>
-    <td>{row['recommend']}</td>
+    <td>{escape(row['date'][5:])}</td>
+    <td>{escape(row['recommend'])}</td>
+    <td>{result_text}</td>
+    <td>{return_text}</td>
     </tr>
     """
 
@@ -111,8 +132,35 @@ def create_page(
         recommend_reason = "🛡 リスク回避"
     elif top_course == "逆チャレンジ":
         recommend_reason = "📉 下落対策"
-    elif top_course == "アメリカ長期国債チャレンジ":
+    elif top_course == "アメリカ超長期国債チャレンジ":
         recommend_reason = "💰 金利低下期待"
+
+    validation_specs = [
+        ("現行コース判定", lambda: evaluate_backtest()),
+        ("ML v1", lambda: evaluate_ml("data/ml_test.csv", "probability_up")),
+        ("ML v2", lambda: evaluate_ml("data/ml_test_v2.csv", "up_probability")),
+    ]
+    validation_html = ""
+
+    for name, evaluator in validation_specs:
+        try:
+            result = evaluator()
+            decision = "ADOPT" if passes_adoption_gate(result) else "REJECT"
+            decision_class = "adopt" if decision == "ADOPT" else "reject"
+            validation_html += f"""<tr>
+                <td>{escape(name)}</td>
+                <td>{result['samples']}</td>
+                <td>{result['accuracy']:.1%}</td>
+                <td>{result['baseline']:.1%}</td>
+                <td>{result['edge']:+.1%}</td>
+                <td><span class="status-badge {decision_class}">{decision}</span></td>
+            </tr>"""
+        except (FileNotFoundError, ValueError, KeyError):
+            validation_html += f"""<tr>
+                <td>{escape(name)}</td>
+                <td colspan="4">検証データなし</td>
+                <td><span class="status-badge pending">N/A</span></td>
+            </tr>"""
 
     qqq_color = "#22c55e" if data["change"] >= 0 else "#ef4444"
     spy_color = "#22c55e" if data["spy_change"] >= 0 else "#ef4444"
@@ -240,18 +288,18 @@ def create_page(
                 <!-- AI実績 -->
                 <div class="card">
                     <div class="small">
-                        <h2>AI実績</h2>
+                        <h2>検証済み実績</h2>
                     </div>
     <div class="stats-grid">
 
         <div class="stat-box">
-            <div class="stat-title">勝率</div>
-            <div class="stat-value">{stats["win_rate"]}%</div>
+            <div class="stat-title">実ETF勝率</div>
+            <div class="stat-value">{win_rate_text}</div>
         </div>
 
         <div class="stat-box">
-            <div class="stat-title">予想</div>
-            <div class="stat-value">{stats["total"]}</div>
+            <div class="stat-title">評価済み</div>
+            <div class="stat-value">{stats["verified_total"]}</div>
         </div>
 
         <div class="stat-box">
@@ -264,7 +312,21 @@ def create_page(
             <div class="stat-value">{stats["lose"]}</div>
         </div>
 
+        <div class="stat-box">
+            <div class="stat-title">判定待ち</div>
+            <div class="stat-value">{stats["pending"]}</div>
+        </div>
+
+        <div class="stat-box legacy-stat">
+            <div class="stat-title">旧方式（参考）</div>
+            <div class="stat-value">{stats["legacy"]}</div>
+        </div>
+
     </div>
+    <p class="data-note">
+        勝率は実際の連動ETFで採点できた予想だけを集計しています。<br>
+        旧方式の記録は勝率に含めません。
+    </p>
 </div>
 </div>
 
@@ -294,10 +356,39 @@ def create_page(
 
         <div class="card">
             <h2>🕒 最近のおすすめ</h2>
+            <div class="table-scroll">
             <table>
+                <thead>
+                    <tr><th>日付</th><th>コース</th><th>結果</th><th>実ETF</th></tr>
+                </thead>
+                <tbody>
                 {recommend_html}
+                </tbody>
             </table>
+            </div>
         </div>
+    </div>
+
+    <div class="card validation-card">
+        <h2>🧪 モデル検証</h2>
+        <p class="data-note">
+            時系列テスト期間で単純基準と比較。200件以上かつ基準を2ポイント以上上回る場合のみ採用します。
+        </p>
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>モデル</th><th>件数</th><th>精度</th><th>基準</th><th>差</th><th>判定</th>
+                </tr>
+            </thead>
+            <tbody>
+                {validation_html}
+            </tbody>
+        </table>
+        </div>
+        <p class="data-note">
+            REJECTは本番推薦への未採用を意味します。バックテスト結果は将来の成果を保証しません。
+        </p>
     </div>
 
 

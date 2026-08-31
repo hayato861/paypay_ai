@@ -2,23 +2,18 @@ import csv
 from pathlib import Path
 
 
-def get_stats():
+def get_stats(file=Path("data/history.csv")):
 
-    file = Path("data/history.csv")
+    file = Path(file)
 
     if not file.exists():
-        return {
-            "total": 0,
-            "win": 0,
-            "lose": 0,
-            "pending": 0,
-            "win_rate": 0
-        }
+        return empty_stats()
 
     total = 0
-    win = 0
-    lose = 0
+    verified_win = 0
+    verified_lose = 0
     pending = 0
+    legacy = 0
 
     with open(file, newline="", encoding="utf-8") as f:
 
@@ -28,28 +23,46 @@ def get_stats():
 
             total += 1
 
-            result = row["result"]
+            result = row.get("result", "Pending")
+            source = row.get("evaluation_source", "")
 
-            if result == "Win":
-                win += 1
+            if source == "etf_v1" and result == "Win":
+                verified_win += 1
 
-            elif result == "Lose":
-                lose += 1
+            elif source == "etf_v1" and result == "Lose":
+                verified_lose += 1
+
+            elif result in {"Win", "Lose"}:
+                legacy += 1
 
             else:
                 pending += 1
 
-    finished = win + lose
+    verified_total = verified_win + verified_lose
 
-    if finished == 0:
-        rate = 0
+    if verified_total == 0:
+        rate = None
     else:
-        rate = round(win / finished * 100, 1)
+        rate = round(verified_win / verified_total * 100, 1)
 
     return {
         "total": total,
-        "win": win,
-        "lose": lose,
+        "verified_total": verified_total,
+        "win": verified_win,
+        "lose": verified_lose,
         "pending": pending,
-        "win_rate": rate
+        "legacy": legacy,
+        "win_rate": rate,
+    }
+
+
+def empty_stats():
+    return {
+        "total": 0,
+        "verified_total": 0,
+        "win": 0,
+        "lose": 0,
+        "pending": 0,
+        "legacy": 0,
+        "win_rate": None,
     }

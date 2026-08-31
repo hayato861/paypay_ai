@@ -2,11 +2,52 @@ import csv
 from pathlib import Path
 from datetime import datetime
 
+HISTORY_FIELDS = [
+    "date",
+    "score",
+    "recommend",
+    "qqq_change",
+    "result",
+    "evaluation_source",
+]
+
+
+def ensure_history_schema(file=Path("data/history.csv")):
+    file = Path(file)
+
+    if not file.exists():
+        return
+
+    with file.open(newline="", encoding="utf-8") as stream:
+        reader = csv.DictReader(stream)
+        rows = list(reader)
+        fieldnames = reader.fieldnames or []
+
+    if fieldnames == HISTORY_FIELDS:
+        return
+
+    for row in rows:
+        if "evaluation_source" not in row:
+            row["evaluation_source"] = (
+                "legacy" if row.get("result") in {"Win", "Lose"} else ""
+            )
+
+    with file.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(
+            stream,
+            fieldnames=HISTORY_FIELDS,
+            lineterminator="\n",
+        )
+        writer.writeheader()
+        writer.writerows({field: row.get(field, "") for field in HISTORY_FIELDS} for row in rows)
+
+
 def save_history(score, recommend):
 
     Path("data").mkdir(exist_ok=True)
     file = Path("data/history.csv")
     today = datetime.now().strftime("%Y-%m-%d")
+    ensure_history_schema(file)
 
     if file.exists():
 
@@ -24,23 +65,18 @@ def save_history(score, recommend):
 
     with open(file, "a", newline="", encoding="utf-8") as f:
 
-        writer = csv.writer(f)
+        writer = csv.writer(f, lineterminator="\n")
 
         if not exists:
-            writer.writerow([
-                "date",
-                "score",
-                "recommend",
-                "qqq_change",
-                "result"
-            ])
+            writer.writerow(HISTORY_FIELDS)
 
         writer.writerow([
             today,
             score,
             recommend,
             "",
-            "Pending"
+            "Pending",
+            "",
         ])
         
         
@@ -50,6 +86,8 @@ def load_history():
 
     if not file.exists():
         return []
+
+    ensure_history_schema(file)
 
     rows = []
 
