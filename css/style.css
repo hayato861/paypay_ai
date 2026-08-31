@@ -403,6 +403,10 @@ table tr:hover{
 .member-header h1{margin-bottom:6px;text-wrap:balance;}
 .member-report li{margin:10px 0;line-height:1.7;}
 .risk-card{border:1px solid rgba(250,204,21,.5);}
+.risk-level{display:inline-block;margin-left:8px;padding:4px 9px;border-radius:999px;font-size:12px;vertical-align:middle;}
+.risk-level.low{color:#86efac;background:rgba(34,197,94,.16);}
+.risk-level.medium{color:#fde68a;background:rgba(250,204,21,.16);}
+.risk-level.high{color:#fca5a5;background:rgba(239,68,68,.18);}
 .premium-data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
 .premium-data-grid span{padding:14px;border-radius:12px;background:#172033;}
 .premium-data-grid strong{float:right;}

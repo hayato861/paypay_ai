@@ -76,6 +76,15 @@ python3 member_app.py
 Stripeのテストカードを使用し、Checkout完了後にWebhookで契約状態が `active` になることを確認する。
 マイページの「支払い・解約を管理」からCustomer Portalへ入り、テスト契約を解約する。
 
+Portal設定が未作成の場合は、次を1回だけ実行する。
+
+```bash
+python3 stripe_portal_setup.py
+python3 stripe_portal_setup.py --confirm-create-test-portal
+```
+
+本番では出力されたConfiguration IDを `STRIPE_PORTAL_CONFIGURATION_ID` に明示設定する。
+
 ## 6. 完了確認
 
 - Checkout成功だけでは権限が付かず、Webhook後に有効化される
@@ -91,4 +100,3 @@ Stripeのテストカードを使用し、Checkout完了後にWebhookで契約�
 - Stripe Customer Portalの解約設定を確認
 - 利用規約、プライバシーポリシー、特商法表示、法務確認
 - Stripe本番Webhookを別途登録
-

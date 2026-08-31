@@ -156,6 +156,20 @@ def create_app(test_config=None):
             raise RuntimeError("テスト環境ではStripe本番キーを使用できません")
         stripe.api_key = key
 
+    def portal_configuration_id():
+        configured = os.getenv("STRIPE_PORTAL_CONFIGURATION_ID", "").strip()
+        if configured:
+            return configured
+        if os.getenv("SERVICE_STAGE", "development") != "development":
+            raise RuntimeError("productionではSTRIPE_PORTAL_CONFIGURATION_IDが必須です")
+        configurations = [
+            item for item in stripe.billing_portal.Configuration.list(limit=10).data
+            if item.active
+        ]
+        if len(configurations) != 1:
+            raise RuntimeError("有効なCustomer Portal設定を1件にしてください")
+        return configurations[0].id
+
     @app.post("/billing/checkout")
     @login_required
     def checkout():
@@ -185,7 +199,9 @@ def create_app(test_config=None):
         if not member["stripe_customer_id"]:
             abort(400)
         portal_session = stripe.billing_portal.Session.create(
-            customer=member["stripe_customer_id"], return_url=request.url_root.rstrip("/") + "/account"
+            customer=member["stripe_customer_id"],
+            configuration=portal_configuration_id(),
+            return_url=request.url_root.rstrip("/") + "/account",
         )
         return redirect(portal_session.url, code=303)
 

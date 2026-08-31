@@ -26,12 +26,32 @@ def create_premium_report_page(
     delta_text = "—" if delta is None else f"{delta:+}点"
     average_text = "—" if average is None else f"{average:.1f}点"
     risk_items = []
+    risk_points = 0
     if data["vix"] >= 25:
-        risk_items.append(f"VIX {data['vix']:.2f}：市場変動の拡大に注意")
+        risk_items.append(f"VIX {data['vix']:.2f}：高警戒。市場変動の拡大に注意")
+        risk_points += 2
+    elif data["vix"] >= 20:
+        risk_items.append(f"VIX {data['vix']:.2f}：注意水準")
+        risk_points += 1
+    else:
+        risk_items.append(f"VIX {data['vix']:.2f}：現在は低位")
     if abs(data["change"]) >= 2:
         risk_items.append(f"QQQ {data['change']:+.2f}%：日次変動が大きい状態")
-    if not risk_items:
-        risk_items.append("設定済みの強い警戒条件は検出されていません")
+        risk_points += 2
+    elif abs(data["change"]) >= 1:
+        risk_items.append(f"QQQ {data['change']:+.2f}%：通常より値動きが大きめ")
+        risk_points += 1
+    else:
+        risk_items.append(f"QQQ {data['change']:+.2f}%：日次変動は設定範囲内")
+    if delta is None:
+        risk_items.append("市場スコア前日差：比較データ不足")
+    elif delta <= -10:
+        risk_items.append(f"市場スコア前日差 {delta:+}点：急低下を検出")
+        risk_points += 2
+    else:
+        risk_items.append(f"市場スコア前日差 {delta:+}点")
+    risk_level = "高" if risk_points >= 4 else "中" if risk_points >= 2 else "低"
+    risk_class = "high" if risk_points >= 4 else "medium" if risk_points >= 2 else "low"
 
     ranking_rows = "".join(
         f"<tr><td>{index}</td><td>{escape(course)}</td><td>{score}点</td></tr>"
@@ -66,7 +86,7 @@ def create_premium_report_page(
   </section>
   <section class="plan-grid">
     <article class="card"><h2>変化点と背景</h2><ul>{analysis_items}</ul></article>
-    <article class="card risk-card"><h2>リスク監視</h2><ul>{risk_html}</ul></article>
+    <article class="card risk-card"><h2>リスク監視 <span class="risk-level {risk_class}">警戒度 {risk_level}</span></h2><ul>{risk_html}</ul></article>
   </section>
   <section class="card"><h2>コース比較</h2><div class="table-scroll"><table><tbody>{ranking_rows}</tbody></table></div></section>
   <section class="card"><h2>主要市場データ</h2><div class="premium-data-grid">

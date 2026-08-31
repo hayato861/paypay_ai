@@ -324,6 +324,8 @@ class ValidationTest(unittest.TestCase):
         self.assertIn("2026-08-31 10:00 JST", html)
         self.assertIn("前日比", html)
         self.assertIn("VIX 30.00", html)
+        self.assertIn("警戒度 高", html)
+        self.assertIn("市場スコア前日差 +5点", html)
         self.assertIn('content="noindex,nofollow,noarchive"', html)
 
     def test_jst_timezone_has_expected_offset(self):

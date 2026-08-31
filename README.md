@@ -81,3 +81,10 @@ python3 stripe_test_setup.py --monthly-yen 980
 
 内容を確認後、テスト環境へ実際に作成するときだけ
 `--confirm-create-test-product`を付ける。出力された`price_id`を`STRIPE_PRICE_ID`へ設定する。
+
+Customer Portalはdry-run確認後、Sandboxへ1回だけ作成する。
+
+```bash
+python3 stripe_portal_setup.py
+python3 stripe_portal_setup.py --confirm-create-test-portal
+```

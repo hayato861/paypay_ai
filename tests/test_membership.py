@@ -8,6 +8,7 @@ from unittest.mock import Mock, patch
 import member_store as store
 from member_app import create_app
 from stripe_test_setup import create_test_product
+from stripe_portal_setup import create_test_portal
 from membership_config_check import checks as membership_checks
 
 
@@ -110,6 +111,11 @@ class MembershipTest(unittest.TestCase):
         result = create_test_product(980)
         self.assertTrue(result["dry_run"])
         self.assertEqual(result["monthly_yen"], 980)
+
+    def test_stripe_portal_setup_is_dry_run_by_default(self):
+        result = create_test_portal()
+        self.assertTrue(result["dry_run"])
+        self.assertEqual(result["features"]["subscription_cancel"], "at_period_end")
 
     def test_health_check_does_not_require_login(self):
         response = self.client.get("/healthz")
