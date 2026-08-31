@@ -1,118 +1,121 @@
 import os
-import sqlite3
-from contextlib import contextmanager
 from pathlib import Path
 
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, create_engine, func, inspect, select, update
+from sqlalchemy.exc import IntegrityError
 
-def database_path():
-    return Path(os.getenv("MEMBER_DB_PATH", "data/members.db"))
+metadata = MetaData()
+members = Table("members", metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("email", String(254), nullable=False, unique=True),
+    Column("stripe_customer_id", String(255), unique=True),
+    Column("subscription_status", String(32), nullable=False, server_default="inactive"),
+    Column("current_period_end", Integer),
+    Column("cancel_at_period_end", Boolean, nullable=False, server_default="false"),
+    Column("created_at", DateTime, nullable=False, server_default=func.now()),
+    Column("updated_at", DateTime, nullable=False, server_default=func.now()))
+login_tokens = Table("login_tokens", metadata,
+    Column("token_hash", String(64), primary_key=True),
+    Column("member_id", Integer, ForeignKey("members.id"), nullable=False),
+    Column("expires_at", Integer, nullable=False), Column("used_at", Integer))
+stripe_events = Table("stripe_events", metadata,
+    Column("event_id", String(255), primary_key=True),
+    Column("processed_at", DateTime, nullable=False, server_default=func.now()))
+_engines = {}
 
 
-@contextmanager
-def connect():
-    path = database_path()
+def database_url():
+    value = os.getenv("DATABASE_URL", "").strip()
+    if value:
+        if value.startswith("postgres://"):
+            value = "postgresql+psycopg://" + value.removeprefix("postgres://")
+        elif value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value.removeprefix("postgresql://")
+        return value
+    path = Path(os.getenv("MEMBER_DB_PATH", "data/members.db"))
     path.parent.mkdir(parents=True, exist_ok=True)
-    db = sqlite3.connect(path)
-    db.row_factory = sqlite3.Row
-    try:
-        yield db
-        db.commit()
-    finally:
-        db.close()
+    return f"sqlite:///{path.resolve()}"
+
+
+def engine():
+    url = database_url()
+    if url not in _engines:
+        _engines[url] = create_engine(url, pool_pre_ping=True)
+    return _engines[url]
 
 
 def initialize():
-    with connect() as db:
-        db.executescript("""
-        CREATE TABLE IF NOT EXISTS members (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          email TEXT NOT NULL UNIQUE,
-          stripe_customer_id TEXT UNIQUE,
-          subscription_status TEXT NOT NULL DEFAULT 'inactive',
-          current_period_end INTEGER,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
-        CREATE TABLE IF NOT EXISTS login_tokens (
-          token_hash TEXT PRIMARY KEY,
-          member_id INTEGER NOT NULL,
-          expires_at INTEGER NOT NULL,
-          used_at INTEGER,
-          FOREIGN KEY(member_id) REFERENCES members(id)
-        );
-        CREATE TABLE IF NOT EXISTS stripe_events (
-          event_id TEXT PRIMARY KEY,
-          processed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
-        """)
+    db_engine = engine()
+    metadata.create_all(db_engine)
+    columns = {column["name"] for column in inspect(db_engine).get_columns("members")}
+    if "cancel_at_period_end" not in columns:
+        with db_engine.begin() as connection:
+            connection.exec_driver_sql("ALTER TABLE members ADD COLUMN cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE")
+
+
+def _member(connection, statement):
+    row = connection.execute(statement).mappings().first()
+    return dict(row) if row else None
 
 
 def get_or_create_member(email):
     normalized = email.strip().lower()
-    with connect() as db:
-        db.execute("INSERT OR IGNORE INTO members(email) VALUES (?)", (normalized,))
-        return db.execute("SELECT * FROM members WHERE email = ?", (normalized,)).fetchone()
+    try:
+        with engine().begin() as connection:
+            connection.execute(members.insert().values(email=normalized))
+    except IntegrityError:
+        pass
+    with engine().connect() as connection:
+        return _member(connection, select(members).where(members.c.email == normalized))
 
 
 def get_member(member_id):
-    with connect() as db:
-        return db.execute("SELECT * FROM members WHERE id = ?", (member_id,)).fetchone()
+    with engine().connect() as connection:
+        return _member(connection, select(members).where(members.c.id == member_id))
 
 
 def get_member_by_customer(customer_id):
-    with connect() as db:
-        return db.execute(
-            "SELECT * FROM members WHERE stripe_customer_id = ?", (customer_id,)
-        ).fetchone()
+    with engine().connect() as connection:
+        return _member(connection, select(members).where(members.c.stripe_customer_id == customer_id))
 
 
 def set_customer(member_id, customer_id):
-    with connect() as db:
-        db.execute(
-            "UPDATE members SET stripe_customer_id=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
-            (customer_id, member_id),
-        )
+    with engine().begin() as connection:
+        connection.execute(update(members).where(members.c.id == member_id).values(stripe_customer_id=customer_id, updated_at=func.now()))
 
 
 def save_login_token(member_id, token_hash, expires_at):
-    with connect() as db:
-        db.execute(
-            "INSERT INTO login_tokens(token_hash,member_id,expires_at) VALUES (?,?,?)",
-            (token_hash, member_id, expires_at),
-        )
+    with engine().begin() as connection:
+        connection.execute(login_tokens.insert().values(token_hash=token_hash, member_id=member_id, expires_at=expires_at))
 
 
 def consume_login_token(token_hash, now):
-    with connect() as db:
-        row = db.execute(
-            "SELECT * FROM login_tokens WHERE token_hash=? AND used_at IS NULL AND expires_at>=?",
-            (token_hash, now),
-        ).fetchone()
+    with engine().begin() as connection:
+        row = connection.execute(select(login_tokens).where(login_tokens.c.token_hash == token_hash, login_tokens.c.used_at.is_(None), login_tokens.c.expires_at >= now)).mappings().first()
         if not row:
             return None
-        db.execute("UPDATE login_tokens SET used_at=? WHERE token_hash=?", (now, token_hash))
+        connection.execute(update(login_tokens).where(login_tokens.c.token_hash == token_hash).values(used_at=now))
         return row["member_id"]
 
 
 def event_processed(event_id):
-    with connect() as db:
-        return db.execute(
-            "SELECT 1 FROM stripe_events WHERE event_id=?", (event_id,)
-        ).fetchone() is not None
+    with engine().connect() as connection:
+        return connection.execute(select(stripe_events.c.event_id).where(stripe_events.c.event_id == event_id)).first() is not None
 
 
 def mark_event_processed(event_id):
-    with connect() as db:
-        db.execute("INSERT OR IGNORE INTO stripe_events(event_id) VALUES (?)", (event_id,))
+    try:
+        with engine().begin() as connection:
+            connection.execute(stripe_events.insert().values(event_id=event_id))
+    except IntegrityError:
+        pass
 
 
-def update_subscription(customer_id, status, period_end=None):
-    with connect() as db:
-        db.execute(
-            """UPDATE members SET subscription_status=?, current_period_end=?,
-               updated_at=CURRENT_TIMESTAMP WHERE stripe_customer_id=?""",
-            (status, period_end, customer_id),
-        )
+def update_subscription(customer_id, status, period_end=None, cancel_at_period_end=False):
+    with engine().begin() as connection:
+        connection.execute(update(members).where(members.c.stripe_customer_id == customer_id).values(
+            subscription_status=status, current_period_end=period_end,
+            cancel_at_period_end=bool(cancel_at_period_end), updated_at=func.now()))
 
 
 def has_paid_access(member):

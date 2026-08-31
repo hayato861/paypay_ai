@@ -87,12 +87,20 @@ class MembershipTest(unittest.TestCase):
         store.set_customer(member["id"], "cus_test")
         construct.return_value = {
             "id": "evt_1", "type": "customer.subscription.updated",
-            "data": {"object": {"customer": "cus_test", "status": "active", "current_period_end": 123}},
+            "data": {"object": {"customer": "cus_test", "status": "active", "current_period_end": 123, "cancel_at_period_end": True}},
         }
         self.client.post("/stripe/webhook", data=b"payload", headers={"Stripe-Signature": "sig"})
         self.client.post("/stripe/webhook", data=b"payload", headers={"Stripe-Signature": "sig"})
         self.assertEqual(store.get_member(member["id"])["subscription_status"], "active")
+        self.assertTrue(store.get_member(member["id"])["cancel_at_period_end"])
         self.assertTrue(store.event_processed("evt_1"))
+
+    def test_postgres_url_uses_psycopg_driver(self):
+        with patch.dict(os.environ, {"DATABASE_URL": "postgres://user:pass@db.example/app"}, clear=True):
+            self.assertEqual(
+                store.database_url(),
+                "postgresql+psycopg://user:pass@db.example/app",
+            )
 
     @patch("member_app.stripe.checkout.Session.create")
     @patch("member_app.stripe.Customer.create")

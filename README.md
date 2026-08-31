@@ -73,6 +73,9 @@ Stripe CLIでローカルWebhookを転送する場合の受信先は
 `http://127.0.0.1:8000/stripe/webhook`。ログインは `/login`、マイページは `/account`。
 本番では `MAGIC_LINK_DELIVERY=smtp` とSMTP設定を使用し、`ALLOW_STRIPE_LIVE=true` は法務・公開判定後のみ設定する。
 
+ローカルは既存のSQLiteを維持する。本番ホスティングでは`DATABASE_URL=postgresql://...`を設定すると
+SQLAlchemy経由でPostgreSQLへ切り替わる。会員・契約・認証トークン・Webhook履歴はGitへ保存しない。
+
 テスト商品作成コマンドは既定でdry-runになり、Stripeには何も作成しない。
 
 ```bash

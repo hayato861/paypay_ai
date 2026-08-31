@@ -422,3 +422,4 @@ table tr:hover{
     border-radius:10px;background:#0f172a;color:#fff;font-size:16px;
 }
 .member-auth button{border:0;cursor:pointer;font-size:15px;}
+.subscription-notice{padding:10px 12px;border-radius:10px;color:#fde68a;background:rgba(250,204,21,.14);}

@@ -15,7 +15,8 @@ LINE個別push経路まで実装済み。広告は同意対応・プライバシ
 会員Webアプリのテスト実装として `member_app.py` と `member_store.py` を追加済み。
 ワンタイムメール認証、Stripe subscription Checkout、Webhook署名検証と冪等処理、
 Customer Portal、`active/trialing`会員だけのレポート表示を実装している。
-SQLiteはローカル試験用のため、本番配備前にPostgreSQL等へ移行し、バックアップと監視を追加する。
+SQLiteはローカル試験用として維持し、`DATABASE_URL`によるPostgreSQL切り替えを実装済み。
+本番配備時にマネージドPostgreSQL、バックアップ、接続監視を設定する。
 
 有料提供はまだ開始しない。`python commercial_readiness.py` が全項目を通過するまで課金導線を公開しない。
 

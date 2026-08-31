@@ -132,7 +132,12 @@ def create_app(test_config=None):
         access = store.has_paid_access(member)
         csrf = csrf_token()
         if access:
+            cancellation = (
+                '<p class="subscription-notice">期間末で解約予定です。</p>'
+                if member.get("cancel_at_period_end") else ""
+            )
             action = f'''<p><a class="premium-button" href="/members/report">会員レポートを見る</a></p>
+            {cancellation}
             <form method="post" action="/billing/portal"><input type="hidden" name="csrf" value="{csrf}">
             <button type="submit">支払い・解約を管理</button></form>'''
         else:
@@ -217,7 +222,7 @@ def create_app(test_config=None):
             return {"received": True}
         obj = event["data"]["object"]
         if event["type"] in {"customer.subscription.created", "customer.subscription.updated", "customer.subscription.deleted"}:
-            store.update_subscription(obj["customer"], obj["status"], obj.get("current_period_end"))
+            store.update_subscription(obj["customer"], obj["status"], obj.get("current_period_end"), obj.get("cancel_at_period_end", False))
         elif event["type"] == "invoice.payment_failed":
             store.update_subscription(obj["customer"], "past_due")
         store.mark_event_processed(event["id"])
