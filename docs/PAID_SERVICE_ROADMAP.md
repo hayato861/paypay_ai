@@ -8,6 +8,10 @@
 LINE個別push経路まで実装済み。広告は同意対応・プライバシーURL・広告IDが揃うまで無効、
 購入導線は法務承認と正式公開フラグが揃うまで無効。
 
+実会員向けHTMLは `premium_report_web.py` が `data/private/premium_report.html` に生成する。
+このディレクトリはGit管理対象外であり、GitHub Pagesには公開しない。本番では認証済み会員だけが
+アクセスできるWebアプリの保護領域へ `PREMIUM_REPORT_OUTPUT` 相当の保存先を接続する。
+
 有料提供はまだ開始しない。`python commercial_readiness.py` が全項目を通過するまで課金導線を公開しない。
 
 ## Phase 0: 法務・商品定義（最優先）

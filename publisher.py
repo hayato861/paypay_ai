@@ -3,6 +3,7 @@ from logger import log
 from notify import notify, notify_paid_member
 from web import create_page
 from premium_web import create_premium_page
+from premium_report_web import create_premium_report_page
 from x import create_x_post, save_x_draft
 
 
@@ -14,6 +15,7 @@ def publish(report, data, market_score, ranking, reasons, insight):
     try:
         create_page(data, market_score, ranking, reasons, insight)
         create_premium_page()
+        create_premium_report_page(data, market_score, ranking, reasons, insight)
         print("✅ WEB")
         log("WEB更新")
     except Exception as error:

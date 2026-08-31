@@ -20,6 +20,7 @@ from clock import JST
 from service import adsense_html, premium_preview_html
 from service import write_ads_txt
 from premium_web import create_premium_page
+from premium_report_web import create_premium_report_page
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -293,6 +294,26 @@ class ValidationTest(unittest.TestCase):
         self.assertIn("準備中・課金未開始", html)
         self.assertNotIn("checkout.example", html)
 
+    @patch("premium_report_web.now_jst", return_value=datetime(2026, 8, 31, 10, 0, tzinfo=JST))
+    @patch("premium_report_web.yesterday_diff", return_value=5)
+    @patch("premium_report_web.average_score", return_value=62.5)
+    def test_private_premium_html_contains_member_analysis(self, average, delta, now):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "private" / "premium_report.html"
+            create_premium_report_page(
+                {"change": -2.5, "spy_change": -1.2, "vix": 30.0},
+                55,
+                [("ゴールド", 80), ("テクノロジー", 65)],
+                ["金利上昇"],
+                ["警戒感が上昇"],
+                output,
+            )
+            html = output.read_text(encoding="utf-8")
+        self.assertIn("2026-08-31 10:00 JST", html)
+        self.assertIn("前日比", html)
+        self.assertIn("VIX 30.00", html)
+        self.assertIn('content="noindex,nofollow,noarchive"', html)
+
     def test_jst_timezone_has_expected_offset(self):
         value = datetime(2026, 8, 31, 10, 0, tzinfo=JST)
         self.assertEqual(value.utcoffset().total_seconds(), 9 * 60 * 60)
@@ -364,6 +385,7 @@ class ValidationTest(unittest.TestCase):
     @patch("publisher.create_x_post", return_value="x draft")
     @patch("publisher.create_market_image", return_value=Path("data/market_report.png"))
     @patch("publisher.notify")
+    @patch("publisher.create_premium_report_page")
     @patch("publisher.create_premium_page")
     @patch("publisher.create_page")
     @patch("publisher.log")
@@ -372,6 +394,7 @@ class ValidationTest(unittest.TestCase):
         log,
         create_page,
         create_premium,
+        create_premium_report_html,
         line_notify,
         create_image,
         create_post,
@@ -384,6 +407,9 @@ class ValidationTest(unittest.TestCase):
 
         line_notify.assert_called_once_with("line report")
         create_premium.assert_called_once_with()
+        create_premium_report_html.assert_called_once_with(
+            data, 60, ranking, [], []
+        )
         create_image.assert_called_once()
         create_post.assert_called_once_with(data, 60, ranking, [])
         save_draft.assert_called_once_with(

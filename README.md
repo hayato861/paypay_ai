@@ -42,3 +42,6 @@ python -m unittest discover -s tests -v
 `premium.html` は公開用のプラン比較ページであり、有料分析本文は含めない。有料分析や会員情報は
 `data/private/` 等へ保存してもGit管理対象にならない。購入導線は `PAID_LAUNCH_ENABLED=true`、
 `LEGAL_REVIEW_APPROVED=true`、`STRIPE_CHECKOUT_URL` がすべて揃った場合だけ表示される。
+
+実際の会員レポートHTMLは毎回 `data/private/premium_report.html` に生成される。このファイルは
+公開リポジトリへコミットせず、本番では認証付きWebアプリからのみ配信する。

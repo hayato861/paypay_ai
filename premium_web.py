@@ -55,6 +55,17 @@ def create_premium_page(output=Path("premium.html")):
         <div class="{action_class}">{action}</div>
     </section>
 
+    <section class="card premium-preview" aria-label="プレミアムレポートの表示例">
+        <span class="premium-label">REPORT PREVIEW</span>
+        <h2>会員画面では、変化を一目で確認</h2>
+        <div class="premium-metrics preview-metrics">
+            <div><span>市場スコア</span><strong>68</strong></div>
+            <div><span>前日比</span><strong>+5点</strong></div>
+            <div><span>7日平均</span><strong>62.5点</strong></div>
+        </div>
+        <p class="data-note">表示値は画面例です。実際の会員レポートは毎朝の市場データから生成されます。</p>
+    </section>
+
     <section class="plan-grid">
         <article class="card">
             <h2>無料版</h2>
@@ -68,8 +79,8 @@ def create_premium_page(output=Path("premium.html")):
 
     <section class="card compliance-card">
         <h2>提供開始について</h2>
-        <p>法務確認、モデル採用基準、会員認証、課金・解約処理、配信試験が完了するまで課金を開始しません。</p>
-        <p>{escape(GENERAL_DISCLAIMER)}</p><p>{escape(PERFORMANCE_DISCLAIMER)}</p><p>{legal_links}</p>
+        <p class="readable-text">法務確認、モデル採用基準、会員認証、課金・解約処理、配信試験が完了するまで課金を開始しません。</p>
+        <p class="readable-text">{escape(GENERAL_DISCLAIMER)}</p><p class="readable-text">{escape(PERFORMANCE_DISCLAIMER)}</p><p>{legal_links}</p>
     </section>
 </main>
 </body>
@@ -78,4 +89,3 @@ def create_premium_page(output=Path("premium.html")):
     output = Path(output)
     output.write_text(html, encoding="utf-8")
     return output
-
