@@ -63,6 +63,7 @@ jobs:
           git add index.html
           git add data/history.csv
           git add data/market_report.png
+          git add data/x_post.txt
 
           if git diff --cached --quiet; then
             echo "No generated changes to commit."

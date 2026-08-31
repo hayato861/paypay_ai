@@ -4,6 +4,9 @@ from config import LINE_CHANNEL_ACCESS_TOKEN
 
 def notify(message):
 
+    if not LINE_CHANNEL_ACCESS_TOKEN:
+        raise RuntimeError("LINE_CHANNEL_ACCESS_TOKENが設定されていません")
+
     url = "https://api.line.me/v2/bot/message/broadcast"
 
     headers = {
@@ -35,8 +38,10 @@ def notify(message):
     r = requests.post(
         url,
         headers=headers,
-        json=body
+        json=body,
+        timeout=15,
     )
 
-    print(r.status_code)
-    print(r.text)
+    r.raise_for_status()
+    print(f"LINE送信成功: HTTP {r.status_code}")
+    return r

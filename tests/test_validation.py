@@ -3,13 +3,17 @@ import csv
 import tempfile
 from datetime import date
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pandas as pd
 
 from backtest import evaluate_next_day, load_market_history
 from grader import grade
+from market import clean_history
 from stats import get_stats
+from notify import notify
+from publisher import publish
+from x import create_x_post, save_x_draft
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -196,6 +200,97 @@ class ValidationTest(unittest.TestCase):
         self.assertEqual(stats["win_rate"], 50.0)
         self.assertEqual(stats["legacy"], 1)
         self.assertEqual(stats["pending"], 1)
+
+    @patch("notify.requests.post")
+    @patch("notify.LINE_CHANNEL_ACCESS_TOKEN", "test-token")
+    def test_line_notification_checks_http_result(self, post):
+        response = Mock(status_code=200)
+        post.return_value = response
+
+        result = notify("test message")
+
+        self.assertIs(result, response)
+        response.raise_for_status.assert_called_once_with()
+        self.assertEqual(post.call_args.kwargs["timeout"], 15)
+        self.assertEqual(
+            post.call_args.kwargs["headers"]["Authorization"],
+            "Bearer test-token",
+        )
+
+    @patch("notify.LINE_CHANNEL_ACCESS_TOKEN", None)
+    def test_line_notification_requires_token(self):
+        with self.assertRaises(RuntimeError):
+            notify("test message")
+
+    @patch("x.get_stats")
+    def test_x_draft_is_short_and_saved_for_manual_post(self, stats):
+        stats.return_value = {"win_rate": 50.0, "verified_total": 2}
+        text = create_x_post(
+            {"change": 0.5, "spy_change": 0.3, "vix": 15.2},
+            60,
+            [("テクノロジーチャレンジ", 85)],
+            [],
+        )
+
+        self.assertLessEqual(len(text), 280)
+        self.assertIn("実ETF勝率 50.0%（2件）", text)
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "x_post.txt"
+            save_x_draft(text, "data/market_report.png", output)
+            saved = output.read_text(encoding="utf-8")
+
+        self.assertEqual(saved, text + "\n")
+
+    def test_market_history_ignores_trailing_nan_close(self):
+        history = pd.DataFrame(
+            {"Close": [100.0, 101.0, float("nan")]},
+            index=pd.to_datetime(["2026-08-27", "2026-08-28", "2026-08-31"]),
+        )
+
+        cleaned = clean_history(history, "QQQ")
+
+        self.assertEqual(cleaned["Close"].tolist(), [100.0, 101.0])
+
+    @patch("x.get_stats")
+    def test_x_draft_rejects_nan_market_data(self, stats):
+        stats.return_value = {"win_rate": None, "verified_total": 0}
+
+        with self.assertRaises(ValueError):
+            create_x_post(
+                {"change": float("nan"), "spy_change": 0.3, "vix": 15.2},
+                60,
+                [("テクノロジー", 80)],
+                [],
+            )
+
+    @patch("publisher.save_x_draft")
+    @patch("publisher.create_x_post", return_value="x draft")
+    @patch("publisher.create_market_image", return_value=Path("data/market_report.png"))
+    @patch("publisher.notify")
+    @patch("publisher.create_page")
+    @patch("publisher.log")
+    def test_publish_sends_line_but_only_saves_x_draft(
+        self,
+        log,
+        create_page,
+        line_notify,
+        create_image,
+        create_post,
+        save_draft,
+    ):
+        data = {"change": 0.5, "spy_change": 0.3, "vix": 15.2}
+        ranking = [("テクノロジーチャレンジ", 85)]
+
+        publish("line report", data, 60, ranking, [], [])
+
+        line_notify.assert_called_once_with("line report")
+        create_image.assert_called_once()
+        create_post.assert_called_once_with(data, 60, ranking, [])
+        save_draft.assert_called_once_with(
+            "x draft",
+            Path("data/market_report.png"),
+        )
 
 
 if __name__ == "__main__":

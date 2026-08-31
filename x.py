@@ -1,80 +1,56 @@
 from pathlib import Path
+from math import isfinite
+
 from stats import get_stats
 
 
 def create_x_post(data, market_score, ranking, insight):
+    for key in ("change", "spy_change", "vix"):
+        if not isfinite(float(data[key])):
+            raise ValueError(f"X原稿に使用できない市場データです: {key}")
 
-    top_course = ranking[0][0]
-    top_score = ranking[0][1]
+    top_course, top_score = ranking[0]
 
-    # 市場判定
     if market_score >= 80:
         market_text = "★★★★★ 強気"
-
     elif market_score >= 60:
         market_text = "★★★★☆ やや強気"
-
     elif market_score >= 40:
         market_text = "★★★☆☆ 中立"
-
     elif market_score >= 20:
         market_text = "★★☆☆☆ やや弱気"
-
     else:
         market_text = "★☆☆☆☆ 弱気"
 
+    stats = get_stats()
+    win_rate = "—" if stats["win_rate"] is None else f'{stats["win_rate"]}%'
 
-    # AIインサイト
-    insight_text = ""
+    return f"""📈 PayPay AI
+市場 {market_score}/100 {market_text}
+🥇 {top_course} {top_score}点
 
-    for item in insight[:4]:
-        insight_text += f"・{item}\n"
-
-
-    text = f"""📈 PayPay AI Morning Report
-
-市場スコア：{market_score} / 100
-{market_text}
-
-🥇 今日のおすすめ
-{top_course}
-{top_score}点
-
-📊 市場
-QQQ {data["change"]:+.2f}%
-S&P500 {data["spy_change"]:+.2f}%
+QQQ {data["change"]:+.2f}% / S&P500 {data["spy_change"]:+.2f}%
 VIX {data["vix"]:.2f}
+実ETF勝率 {win_rate}（{stats['verified_total']}件）
 
-🧠 AIインサイト
-{insight_text}
+#PayPayポイント運用"""
 
-毎朝自動更新しています。
-"""
 
-    return text
+def save_x_draft(text, image_path=None, output=Path("data/x_post.txt")):
+    output = Path(output)
+    output.parent.mkdir(exist_ok=True)
+    output.write_text(text.rstrip() + "\n", encoding="utf-8")
+
+    print("X手動投稿用テキストを保存:", output)
+
+    if image_path:
+        print("X手動添付画像:", image_path)
+    else:
+        print("X手動添付画像なし")
+
+    return output
 
 
 def post(report, image_path=None):
-
-    # X投稿内容を保存
-    output = Path("logs/x_post.txt")
-
-    output.parent.mkdir(
-        exist_ok=True
-    )
-
-    output.write_text(
-        report,
-        encoding="utf-8"
-    )
-
-    print("X投稿内容を保存しました")
-
-    # 画像が生成されている場合
-    if image_path:
-
-        print("X投稿画像:", image_path)
-
-    else:
-
-        print("X投稿画像なし")
+    """旧呼び出しとの互換用。X APIへの送信は行わない。"""
+    return save_x_draft(report, image_path)

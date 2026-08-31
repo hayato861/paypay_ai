@@ -1,5 +1,6 @@
 import yfinance as yf
 import requests
+import pandas as pd
 
 TICKERS = {
     "QQQ": "QQQ",
@@ -11,6 +12,20 @@ TICKERS = {
 }
 
 
+def clean_history(history, ticker, minimum_rows=2):
+    if "Close" not in history:
+        raise ValueError(f"{ticker}の終値データがありません")
+
+    cleaned = history.copy()
+    cleaned["Close"] = pd.to_numeric(cleaned["Close"], errors="coerce")
+    cleaned = cleaned.dropna(subset=["Close"])
+
+    if len(cleaned) < minimum_rows:
+        raise ValueError(f"{ticker}の有効な終値が不足しています")
+
+    return cleaned
+
+
 def get_market_data():
     qqq = yf.Ticker(TICKERS["QQQ"])
     spy = yf.Ticker(TICKERS["SPY"])
@@ -19,12 +34,12 @@ def get_market_data():
     tnx = yf.Ticker(TICKERS["TNX"])
     usdjpy = yf.Ticker(TICKERS["USDJPY"])
 
-    qqq_hist = qqq.history(period="120d")
-    spy_hist = spy.history(period="5d")
-    vix_hist = vix.history(period="5d")
-    gold_hist = gold.history(period="5d")
-    tnx_hist = tnx.history(period="5d")
-    usdjpy_hist = usdjpy.history(period="5d")
+    qqq_hist = clean_history(qqq.history(period="120d"), "QQQ", 75)
+    spy_hist = clean_history(spy.history(period="5d"), "SPY")
+    vix_hist = clean_history(vix.history(period="5d"), "VIX")
+    gold_hist = clean_history(gold.history(period="5d"), "GLD")
+    tnx_hist = clean_history(tnx.history(period="5d"), "TNX")
+    usdjpy_hist = clean_history(usdjpy.history(period="5d"), "USDJPY")
     
     # ゴールド前日比
     gold_change = (
