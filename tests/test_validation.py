@@ -293,6 +293,10 @@ class ValidationTest(unittest.TestCase):
             html = output.read_text(encoding="utf-8")
         self.assertIn("準備中・課金未開始", html)
         self.assertNotIn("checkout.example", html)
+        self.assertIn("<span>数字だけで終わらない。</span>", html)
+        self.assertIn("変化点と背景", html)
+        self.assertIn("リスク監視", html)
+        self.assertIn("よくある質問", html)
 
     @patch("premium_report_web.now_jst", return_value=datetime(2026, 8, 31, 10, 0, tzinfo=JST))
     @patch("premium_report_web.yesterday_diff", return_value=5)

@@ -354,12 +354,13 @@ table tr:hover{
 .premium-hero h1{
     max-width:760px;
     margin:14px auto;
-    font-size:clamp(32px,6vw,54px);
+    font-size:clamp(30px,4.4vw,48px);
     line-height:1.25;
     text-wrap:balance;
     word-break:keep-all;
     overflow-wrap:anywhere;
 }
+.premium-hero h1 span{display:block;}
 .premium-hero>p,.readable-text{
     max-width:720px;
     margin-left:auto;
@@ -380,6 +381,24 @@ table tr:hover{
 .preview-metrics>div,.premium-metrics>.card{text-align:center;}
 .premium-metrics span{display:block;color:#94a3b8;font-size:13px;}
 .premium-metrics strong{display:block;margin-top:8px;font-size:30px;}
+.premium-sample-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;}
+.sample-panel{padding:18px;border-radius:14px;background:#172033;}
+.sample-panel h3,.sample-ranking h3{margin:0 0 12px;}
+.sample-panel li{margin:9px 0;line-height:1.6;}
+.risk-panel{border:1px solid rgba(250,204,21,.35);}
+.sample-ranking{margin-top:14px;padding:18px;border-radius:14px;background:#172033;}
+.sample-ranking-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid #334155;}
+.sample-ranking-row:last-child{border-bottom:0;}
+.delivery-section h2{text-wrap:balance;word-break:keep-all;}
+.delivery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;}
+.delivery-grid>div{padding:18px;border-radius:14px;background:#172033;}
+.delivery-grid>div>strong{display:flex;width:34px;height:34px;align-items:center;justify-content:center;border-radius:50%;background:#0ea5e9;}
+.delivery-grid h3{line-height:1.5;}
+.delivery-grid p{color:#cbd5e1;line-height:1.7;}
+.faq-section details{padding:16px 0;border-bottom:1px solid #334155;}
+.faq-section details:last-child{border-bottom:0;}
+.faq-section summary{cursor:pointer;font-weight:700;}
+.faq-section details p{color:#cbd5e1;line-height:1.8;}
 .member-header h1{margin-bottom:6px;text-wrap:balance;}
 .member-report li{margin:10px 0;line-height:1.7;}
 .risk-card{border:1px solid rgba(250,204,21,.5);}
@@ -387,6 +406,7 @@ table tr:hover{
 .premium-data-grid span{padding:14px;border-radius:12px;background:#172033;}
 .premium-data-grid strong{float:right;}
 @media(max-width:600px){
-    .premium-metrics,.premium-data-grid{grid-template-columns:1fr;}
+    .premium-metrics,.premium-data-grid,.premium-sample-grid,.delivery-grid{grid-template-columns:1fr;}
     .premium-hero{padding:36px 20px;}
+    .premium-hero h1{font-size:30px;}
 }
