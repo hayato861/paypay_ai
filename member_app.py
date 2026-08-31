@@ -38,7 +38,7 @@ def send_login_link(email, link):
         if os.getenv("SERVICE_STAGE", "development") != "development":
             raise RuntimeError("console認証リンクはdevelopmentでのみ使用できます")
         print(f"MAGIC LINK for {email}: {link}")
-        return
+        return "console"
     message = EmailMessage()
     message["Subject"] = "PayPay AI ログインリンク"
     message["From"] = _required("SMTP_FROM")
@@ -47,6 +47,7 @@ def send_login_link(email, link):
     with smtplib.SMTP_SSL(_required("SMTP_HOST"), int(os.getenv("SMTP_PORT", "465"))) as smtp:
         smtp.login(_required("SMTP_USERNAME"), _required("SMTP_PASSWORD"))
         smtp.send_message(message)
+    return "smtp"
 
 
 def create_app(test_config=None):
@@ -106,7 +107,12 @@ def create_app(test_config=None):
         member = store.get_or_create_member(email)
         token = secrets.token_urlsafe(32)
         store.save_login_token(member["id"], hashlib.sha256(token.encode()).hexdigest(), int(time.time()) + 900)
-        send_login_link(email, request.url_root.rstrip("/") + "/verify?token=" + token)
+        delivery = send_login_link(email, request.url_root.rstrip("/") + "/verify?token=" + token)
+        if delivery == "console":
+            return _page(
+                "ターミナルを確認してください",
+                "<p>開発モードです。member_app.pyを起動しているターミナルに、有効期限15分のMAGIC LINKを表示しました。</p>",
+            )
         return _page("メールを確認してください", "<p>有効期限15分のログインリンクを送信しました。</p>")
 
     @app.get("/verify")

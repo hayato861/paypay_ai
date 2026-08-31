@@ -38,20 +38,21 @@ class MembershipTest(unittest.TestCase):
 
     def login(self):
         captured = {}
-        with patch("member_app.send_login_link", side_effect=lambda email, link: captured.update(link=link)):
+        with patch("member_app.send_login_link", side_effect=lambda email, link: (captured.update(link=link), "console")[1]):
             response = self.client.post("/login", data={"email": "Member@example.com", "csrf": self.csrf()})
         self.assertEqual(response.status_code, 200)
         return self.client.get(captured["link"].split("?", 1)[1].join(["/verify?", ""]), follow_redirects=True)
 
     def test_magic_link_login_is_one_time_and_normalizes_email(self):
         captured = {}
-        with patch("member_app.send_login_link", side_effect=lambda email, link: captured.update(link=link)):
-            self.client.post("/login", data={"email": "Member@Example.COM", "csrf": self.csrf()})
+        with patch("member_app.send_login_link", side_effect=lambda email, link: (captured.update(link=link), "console")[1]):
+            response = self.client.post("/login", data={"email": "Member@Example.COM", "csrf": self.csrf()})
         path = "/verify?" + captured["link"].split("?", 1)[1]
         first = self.client.get(path, follow_redirects=True)
         second = self.client.get(path)
         self.assertIn("member@example.com", first.get_data(as_text=True))
         self.assertEqual(second.status_code, 400)
+        self.assertIn("ターミナルを確認", response.get_data(as_text=True))
 
     def test_login_rejects_malformed_email(self):
         response = self.client.post(
