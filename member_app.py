@@ -10,6 +10,7 @@ from html import escape
 from pathlib import Path
 
 import stripe
+import requests
 from stripe._error import SignatureVerificationError
 from flask import Flask, abort, redirect, request, send_from_directory, session
 from dotenv import load_dotenv
@@ -34,11 +35,31 @@ def _page(title, body):
 
 
 def send_login_link(email, link):
-    if os.getenv("MAGIC_LINK_DELIVERY", "console") == "console":
+    delivery = os.getenv("MAGIC_LINK_DELIVERY", "console").strip().lower()
+    if delivery == "console":
         if os.getenv("SERVICE_STAGE", "development") != "development":
             raise RuntimeError("console認証リンクはdevelopmentでのみ使用できます")
         print(f"MAGIC LINK for {email}: {link}")
         return "console"
+    if delivery == "resend":
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {_required('RESEND_API_KEY')}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": _required("EMAIL_FROM"),
+                "to": [email],
+                "subject": "PayPay AI ログインリンク",
+                "text": f"15分以内にこちらからログインしてください。\n{link}",
+            },
+            timeout=15,
+        )
+        response.raise_for_status()
+        return "resend"
+    if delivery != "smtp":
+        raise RuntimeError("MAGIC_LINK_DELIVERYはconsole、resend、smtpのいずれかです")
     message = EmailMessage()
     message["Subject"] = "PayPay AI ログインリンク"
     message["From"] = _required("SMTP_FROM")
@@ -90,6 +111,10 @@ def create_app(test_config=None):
     @app.get("/healthz")
     def healthz():
         return {"status": "ok", "service": "paypay-ai-members"}
+
+    @app.get("/")
+    def home():
+        return redirect("/login")
 
     @app.get("/login")
     def login():

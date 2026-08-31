@@ -138,6 +138,25 @@ class MembershipTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json()["status"], "ok")
 
+    def test_root_redirects_to_login(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/login")
+
+    @patch("member_app.requests.post")
+    def test_resend_delivery_uses_https_api(self, post):
+        post.return_value.raise_for_status.return_value = None
+        with patch.dict(os.environ, {
+            "MAGIC_LINK_DELIVERY": "resend",
+            "RESEND_API_KEY": "re_test_secret",
+            "EMAIL_FROM": "PayPay AI <login@example.com>",
+        }, clear=False):
+            from member_app import send_login_link
+            self.assertEqual(send_login_link("member@example.com", "https://example.com/verify"), "resend")
+        self.assertEqual(post.call_args.args[0], "https://api.resend.com/emails")
+        self.assertEqual(post.call_args.kwargs["timeout"], 15)
+        self.assertNotIn("re_test_secret", repr(post.call_args.kwargs["json"]))
+
     def test_membership_configuration_can_be_checked_without_printing_secrets(self):
         with patch.dict(os.environ, {
             "MEMBER_SESSION_SECRET": "x" * 48,

@@ -1,0 +1,30 @@
+name: Premium report
+
+on:
+  schedule:
+    - cron: "20 0 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: paypay-ai-premium-report
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Generate and store premium report
+        env:
+          DATABASE_URL: ${{ secrets.MEMBER_DATABASE_URL }}
+        run: |
+          test -n "$DATABASE_URL"
+          python generate_premium_report.py

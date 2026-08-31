@@ -44,8 +44,8 @@ def run_checks():
         ),
         Check(
             "production_email_delivery",
-            os.getenv("MAGIC_LINK_DELIVERY") == "smtp",
-            "本番ログインリンクはconsoleではなくSMTP配信が必要",
+            os.getenv("MAGIC_LINK_DELIVERY") in {"smtp", "resend"},
+            "本番ログインリンクはconsoleではなくメール配信が必要",
         ),
         Check(
             "stripe_configuration",
