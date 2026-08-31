@@ -109,9 +109,9 @@ class MembershipTest(unittest.TestCase):
     def test_membership_configuration_can_be_checked_without_printing_secrets(self):
         with patch.dict(os.environ, {
             "MEMBER_SESSION_SECRET": "x" * 48,
-            "STRIPE_SECRET_KEY": "sk_test_hidden",
-            "STRIPE_PRICE_ID": "price_test",
-            "STRIPE_WEBHOOK_SECRET": "whsec_test",
+            "STRIPE_SECRET_KEY": "sk_test_hidden_but_long_enough",
+            "STRIPE_PRICE_ID": "price_test_long_enough",
+            "STRIPE_WEBHOOK_SECRET": "whsec_test_long_enough",
             "MEMBER_DB_PATH": str(Path(self.directory.name) / "members.db"),
             "SERVICE_STAGE": "development",
         }, clear=True):

@@ -3,6 +3,9 @@ import json
 import os
 
 import stripe
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def require_test_key():
@@ -55,4 +58,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
