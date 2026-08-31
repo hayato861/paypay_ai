@@ -284,3 +284,21 @@ table tr:hover{
     color:#fde68a;
     background:rgba(250,204,21,.15);
 }
+
+.service-stage{
+    display:inline-block;
+    margin-top:14px;
+    padding:6px 12px;
+    border:1px solid rgba(255,255,255,.45);
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+}
+
+.compliance-card{
+    border:1px solid #475569;
+}
+
+.compliance-card p{
+    line-height:1.7;
+}

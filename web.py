@@ -6,6 +6,11 @@ from stats import get_stats
 
 from history import recent_history
 from validation import evaluate_backtest, evaluate_ml, passes_adoption_gate
+from service import (
+    GENERAL_DISCLAIMER,
+    PERFORMANCE_DISCLAIMER,
+    service_stage_label,
+)
 import json
 
 import requests
@@ -253,6 +258,9 @@ def create_page(
                 
                 <div class="small">
                     更新日時：{now}
+                </div>
+                <div class="service-stage">
+                    {escape(service_stage_label())}
                 </div>
             </div>
             
@@ -504,6 +512,15 @@ def create_page(
 
         </div>
 
+    </div>
+
+    <div class="card compliance-card">
+        <h2>⚠️ ご利用上の注意</h2>
+        <p>{escape(GENERAL_DISCLAIMER)}</p>
+        <p>{escape(PERFORMANCE_DISCLAIMER)}</p>
+        <p class="data-note">
+            現在は無料ベータです。有料サービスの提供は、法務確認・利用規約・会員限定配信・課金基盤の準備完了後に開始します。
+        </p>
     </div>
 
         <footer>

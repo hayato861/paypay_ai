@@ -14,6 +14,7 @@ from stats import get_stats
 from notify import notify
 from publisher import publish
 from x import create_x_post, save_x_draft
+from commercial_readiness import Check, report
 from validation import (
     directional_accuracy,
     evaluate_predictions,
@@ -291,6 +292,19 @@ class ValidationTest(unittest.TestCase):
             "x draft",
             Path("data/market_report.png"),
         )
+
+    def test_paid_launch_requires_every_readiness_check(self):
+        blocked = report([
+            Check("legal", True, "ok"),
+            Check("model", False, "below baseline"),
+        ])
+        ready = report([
+            Check("legal", True, "ok"),
+            Check("model", True, "ok"),
+        ])
+
+        self.assertFalse(blocked["ready_for_paid_launch"])
+        self.assertTrue(ready["ready_for_paid_launch"])
 
 
 if __name__ == "__main__":

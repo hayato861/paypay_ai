@@ -1,4 +1,5 @@
 from stats import get_stats
+from service import GENERAL_DISCLAIMER, PERFORMANCE_DISCLAIMER
 
 def create_report(data, market_score, reasons, ranking, insight):
 
@@ -74,6 +75,9 @@ VIX      : {data['vix']:.2f}
         report += f"{mark} {course}（{score}点）\n"
 
     report += "\n━━━━━━━━━━━━━━\n"
+    report += "⚠️ ご利用上の注意\n"
+    report += GENERAL_DISCLAIMER + "\n"
+    report += PERFORMANCE_DISCLAIMER + "\n\n"
     report += "🤖 Powered by PayPay AI"
 
     return report

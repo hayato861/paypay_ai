@@ -33,7 +33,8 @@ QQQ {data["change"]:+.2f}% / S&P500 {data["spy_change"]:+.2f}%
 VIX {data["vix"]:.2f}
 実ETF勝率 {win_rate}（{stats['verified_total']}件）
 
-#PayPayポイント運用"""
+#PayPayポイント運用
+※情報提供のみ。投資判断はご自身で。"""
 
 
 def save_x_draft(text, image_path=None, output=Path("data/x_post.txt")):
