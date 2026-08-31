@@ -102,6 +102,14 @@ class MembershipTest(unittest.TestCase):
                 "postgresql+psycopg://user:pass@db.example/app",
             )
 
+    def test_latest_premium_report_is_shared_through_database(self):
+        store.save_premium_report("2026-08-30", "OLDER")
+        store.save_premium_report("2026-08-31", "LATEST")
+        store.save_premium_report("2026-08-31", "UPDATED")
+        report = store.latest_premium_report()
+        self.assertEqual(report["report_date"], "2026-08-31")
+        self.assertEqual(report["html"], "UPDATED")
+
     @patch("member_app.stripe.checkout.Session.create")
     @patch("member_app.stripe.Customer.create")
     def test_checkout_uses_subscription_mode(self, customer_create, session_create):

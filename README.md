@@ -56,6 +56,8 @@ python3 generate_premium_report.py
 
 詳細手順: `docs/STRIPE_TEST_SETUP.md`
 
+公開手順: `docs/DEPLOY_MEMBERS.md`
+
 `member_app.py` はメールのワンタイムリンク認証、Stripe Checkout、署名検証済みWebhook、
 Customer Portal、契約中会員だけのレポート表示を提供する。初期段階では必ずStripeテストキーを使う。
 

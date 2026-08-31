@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, create_engine, func, inspect, select, update
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, Text, create_engine, func, inspect, select, update
 from sqlalchemy.exc import IntegrityError
 
 metadata = MetaData()
@@ -21,6 +21,10 @@ login_tokens = Table("login_tokens", metadata,
 stripe_events = Table("stripe_events", metadata,
     Column("event_id", String(255), primary_key=True),
     Column("processed_at", DateTime, nullable=False, server_default=func.now()))
+premium_reports = Table("premium_reports", metadata,
+    Column("report_date", String(10), primary_key=True),
+    Column("html", Text, nullable=False),
+    Column("created_at", DateTime, nullable=False, server_default=func.now()))
 _engines = {}
 
 
@@ -116,6 +120,35 @@ def update_subscription(customer_id, status, period_end=None, cancel_at_period_e
         connection.execute(update(members).where(members.c.stripe_customer_id == customer_id).values(
             subscription_status=status, current_period_end=period_end,
             cancel_at_period_end=bool(cancel_at_period_end), updated_at=func.now()))
+
+
+def save_premium_report(report_date, html):
+    with engine().begin() as connection:
+        existing = connection.execute(
+            select(premium_reports.c.report_date).where(
+                premium_reports.c.report_date == report_date
+            )
+        ).first()
+        if existing:
+            connection.execute(
+                update(premium_reports)
+                .where(premium_reports.c.report_date == report_date)
+                .values(html=html, created_at=func.now())
+            )
+        else:
+            connection.execute(
+                premium_reports.insert().values(report_date=report_date, html=html)
+            )
+
+
+def latest_premium_report():
+    with engine().connect() as connection:
+        row = connection.execute(
+            select(premium_reports)
+            .order_by(premium_reports.c.report_date.desc())
+            .limit(1)
+        ).mappings().first()
+        return dict(row) if row else None
 
 
 def has_paid_access(member):

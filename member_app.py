@@ -234,12 +234,15 @@ def create_app(test_config=None):
         if not store.has_paid_access(current_member()):
             abort(403)
         report_path = Path(os.getenv("PREMIUM_REPORT_OUTPUT", "data/private/premium_report.html"))
-        if not report_path.exists():
+        if report_path.exists():
+            return report_path.read_text(encoding="utf-8")
+        stored_report = store.latest_premium_report()
+        if not stored_report:
             return _page(
                 "レポート準備中",
                 "<p>本日の会員レポートはまだ生成されていません。しばらくしてから再読み込みしてください。</p>",
             ), 503
-        return report_path.read_text(encoding="utf-8")
+        return stored_report["html"]
 
     return app
 
