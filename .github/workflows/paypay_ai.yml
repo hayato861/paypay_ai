@@ -62,6 +62,7 @@ jobs:
           STRIPE_CHECKOUT_URL: ${{ vars.STRIPE_CHECKOUT_URL }}
           TERMS_URL: ${{ vars.TERMS_URL }}
           PRIVACY_URL: ${{ vars.PRIVACY_URL }}
+          MEMBER_APP_URL: ${{ vars.MEMBER_APP_URL }}
         run: |
           python main.py
 

@@ -64,3 +64,12 @@ python3 member_app.py
 Stripe CLIでローカルWebhookを転送する場合の受信先は
 `http://127.0.0.1:8000/stripe/webhook`。ログインは `/login`、マイページは `/account`。
 本番では `MAGIC_LINK_DELIVERY=smtp` とSMTP設定を使用し、`ALLOW_STRIPE_LIVE=true` は法務・公開判定後のみ設定する。
+
+テスト商品作成コマンドは既定でdry-runになり、Stripeには何も作成しない。
+
+```bash
+python3 stripe_test_setup.py --monthly-yen 980
+```
+
+内容を確認後、テスト環境へ実際に作成するときだけ
+`--confirm-create-test-product`を付ける。出力された`price_id`を`STRIPE_PRICE_ID`へ設定する。

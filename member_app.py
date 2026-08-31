@@ -47,6 +47,8 @@ def send_login_link(email, link):
 
 
 def create_app(test_config=None):
+    if os.getenv("SERVICE_STAGE") == "production" and not os.getenv("MEMBER_SESSION_SECRET", "").strip():
+        raise RuntimeError("productionではMEMBER_SESSION_SECRETが必須です")
     app = Flask(__name__, static_folder=None)
     app.config.update(
         SECRET_KEY=os.getenv("MEMBER_SESSION_SECRET", secrets.token_hex(32)),
@@ -80,6 +82,10 @@ def create_app(test_config=None):
     @app.get("/css/<path:filename>")
     def styles(filename):
         return send_from_directory("css", filename)
+
+    @app.get("/healthz")
+    def healthz():
+        return {"status": "ok", "service": "paypay-ai-members"}
 
     @app.get("/login")
     def login():

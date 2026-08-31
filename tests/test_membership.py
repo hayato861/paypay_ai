@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 import member_store as store
 from member_app import create_app
+from stripe_test_setup import create_test_product
 
 
 class MembershipTest(unittest.TestCase):
@@ -93,6 +94,16 @@ class MembershipTest(unittest.TestCase):
         self.assertEqual(response.status_code, 303)
         self.assertEqual(session_create.call_args.kwargs["mode"], "subscription")
         self.assertEqual(session_create.call_args.kwargs["line_items"][0]["price"], "price_test")
+
+    def test_stripe_product_setup_is_dry_run_by_default(self):
+        result = create_test_product(980)
+        self.assertTrue(result["dry_run"])
+        self.assertEqual(result["monthly_yen"], 980)
+
+    def test_health_check_does_not_require_login(self):
+        response = self.client.get("/healthz")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json()["status"], "ok")
 
 
 if __name__ == "__main__":

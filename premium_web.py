@@ -15,6 +15,7 @@ def create_premium_page(output=Path("premium.html")):
     price = os.getenv("PREMIUM_PRICE_LABEL", "月額料金未定").strip()
     checkout_url = os.getenv("STRIPE_CHECKOUT_URL", "").strip()
     signup_url = os.getenv("PREMIUM_SIGNUP_URL", "").strip()
+    member_app_url = os.getenv("MEMBER_APP_URL", "").strip().rstrip("/")
     can_sell = (
         env_enabled("PAID_LAUNCH_ENABLED")
         and env_enabled("LEGAL_REVIEW_APPROVED")
@@ -34,6 +35,10 @@ def create_premium_page(output=Path("premium.html")):
     terms = _link(os.getenv("TERMS_URL", "").strip(), "利用規約")
     privacy = _link(os.getenv("PRIVACY_URL", "").strip(), "プライバシーポリシー")
     legal_links = " ｜ ".join(link for link in (terms, privacy) if link)
+    login_link = (
+        f'\n        <a class="member-login-link" href="{escape(member_app_url, quote=True)}/login">会員ログイン</a>'
+        if member_app_url else ""
+    )
 
     html = f"""<!DOCTYPE html>
 <html lang="ja">
@@ -52,7 +57,7 @@ def create_premium_page(output=Path("premium.html")):
         <h1><span>数字だけで終わらない。</span><span>毎朝の市場を、わかりやすく。</span></h1>
         <p>無料版の市場サマリーに加え、変化点、7日傾向、警戒条件を整理して個別LINEへ届けます。</p>
         <div class="premium-price">{escape(price)}</div>
-        <div class="{action_class}">{action}</div>
+        <div class="{action_class}">{action}</div>{login_link}
     </section>
 
     <section class="card premium-preview" aria-label="プレミアムレポートの表示例">

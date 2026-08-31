@@ -298,6 +298,14 @@ class ValidationTest(unittest.TestCase):
         self.assertIn("リスク監視", html)
         self.assertIn("よくある質問", html)
 
+    @patch.dict("os.environ", {"MEMBER_APP_URL": "https://members.example.com/"}, clear=True)
+    def test_premium_page_links_to_separate_member_app(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "premium.html"
+            create_premium_page(output)
+            html = output.read_text(encoding="utf-8")
+        self.assertIn('href="https://members.example.com/login"', html)
+
     @patch("premium_report_web.now_jst", return_value=datetime(2026, 8, 31, 10, 0, tzinfo=JST))
     @patch("premium_report_web.yesterday_diff", return_value=5)
     @patch("premium_report_web.average_score", return_value=62.5)
