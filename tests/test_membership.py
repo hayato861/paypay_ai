@@ -102,6 +102,16 @@ class MembershipTest(unittest.TestCase):
                 "postgresql+psycopg://user:pass@db.example/app",
             )
 
+    def test_schema_initialization_prefers_unpooled_url(self):
+        with patch.dict(os.environ, {
+            "DATABASE_URL": "postgresql://user:pass@db-pooler.example/app",
+            "DATABASE_URL_UNPOOLED": "postgresql://user:pass@db.example/app",
+        }, clear=True):
+            self.assertEqual(
+                store.migration_database_url(),
+                "postgresql+psycopg://user:pass@db.example/app",
+            )
+
     def test_latest_premium_report_is_shared_through_database(self):
         store.save_premium_report("2026-08-30", "OLDER")
         store.save_premium_report("2026-08-31", "LATEST")

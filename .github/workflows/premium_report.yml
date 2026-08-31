@@ -25,6 +25,7 @@ jobs:
       - name: Generate and store premium report
         env:
           DATABASE_URL: ${{ secrets.MEMBER_DATABASE_URL }}
+          DATABASE_URL_UNPOOLED: ${{ secrets.MEMBER_DATABASE_URL_UNPOOLED }}
         run: |
           test -n "$DATABASE_URL"
           python generate_premium_report.py

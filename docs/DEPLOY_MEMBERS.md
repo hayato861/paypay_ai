@@ -24,7 +24,8 @@ Render無料PostgreSQLは作成30日後に失効するため、どちらもBluep
 
 ## Renderの必須環境変数
 
-- `DATABASE_URL`: 外部PostgreSQL接続文字列
+- `DATABASE_URL`: Neonのpooled接続文字列（通常のWeb通信）
+- `DATABASE_URL_UNPOOLED`: Neonのdirect接続文字列（テーブル初期化）
 - Stripe Sandbox: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`
 - Portal: `STRIPE_PORTAL_CONFIGURATION_ID`
 - Resend: `RESEND_API_KEY`, `EMAIL_FROM`（認証済み送信元）
@@ -33,7 +34,7 @@ Render無料PostgreSQLは作成30日後に失効するため、どちらもBluep
 
 ## GitHubの設定
 
-Repository Secretに`MEMBER_DATABASE_URL`として、同じPostgreSQL接続文字列を登録する。
+Repository Secretsに`MEMBER_DATABASE_URL`（pooled）と`MEMBER_DATABASE_URL_UNPOOLED`（direct）を登録する。
 Repository Variableの`MEMBER_APP_URL`にはRenderの公開URLを登録する。
 Actionsの`Premium report`を手動実行し、会員画面でレポートが読めることを確認する。
 

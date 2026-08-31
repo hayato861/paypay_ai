@@ -28,28 +28,42 @@ premium_reports = Table("premium_reports", metadata,
 _engines = {}
 
 
-def database_url():
-    value = os.getenv("DATABASE_URL", "").strip()
+def _normalize_database_url(value):
     if value:
         if value.startswith("postgres://"):
             value = "postgresql+psycopg://" + value.removeprefix("postgres://")
         elif value.startswith("postgresql://"):
             value = "postgresql+psycopg://" + value.removeprefix("postgresql://")
         return value
+
+
+def database_url():
+    value = _normalize_database_url(os.getenv("DATABASE_URL", "").strip())
+    if value:
+        return value
     path = Path(os.getenv("MEMBER_DB_PATH", "data/members.db"))
     path.parent.mkdir(parents=True, exist_ok=True)
     return f"sqlite:///{path.resolve()}"
 
 
-def engine():
-    url = database_url()
+def migration_database_url():
+    return _normalize_database_url(
+        os.getenv("DATABASE_URL_UNPOOLED", "").strip()
+    ) or database_url()
+
+
+def _engine(url):
     if url not in _engines:
         _engines[url] = create_engine(url, pool_pre_ping=True)
     return _engines[url]
 
 
+def engine():
+    return _engine(database_url())
+
+
 def initialize():
-    db_engine = engine()
+    db_engine = _engine(migration_database_url())
     metadata.create_all(db_engine)
     columns = {column["name"] for column in inspect(db_engine).get_columns("members")}
     if "cancel_at_period_end" not in columns:
