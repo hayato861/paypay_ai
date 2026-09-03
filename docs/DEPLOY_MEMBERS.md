@@ -7,7 +7,7 @@ Render無料PostgreSQLは作成30日後に失効するため、どちらもBluep
 
 - 会員Web: Render Free Web Service（15分無通信で休止）
 - 会員DB: 外部の無料PostgreSQL。接続文字列をRenderの`DATABASE_URL`へ設定
-- レポート生成: `.github/workflows/premium_report.yml`（平日9:20 JST）
+- レポート生成: `.github/workflows/premium_report.yml`（平日20:40 JSTを目安。Actionsにより遅延する場合あり）
 - ログインメール: HTTPSで送れるResend。Render無料WebではSMTPポートを利用できない
 - 決済: Stripe Sandboxのみ。実課金は開始しない
 

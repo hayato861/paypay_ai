@@ -19,7 +19,7 @@ def create_report(data, market_score, reasons, ranking, insight):
     else:
         stars = "★☆☆☆☆"
 
-    report = f"""📈 PayPay AI Morning Report
+    report = f"""📈 PayPay AI Market Report
 
 市場スコア：{market_score}点
 判定：{stars}

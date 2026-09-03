@@ -18,7 +18,7 @@ def create_line_message(
 
     return {
         "type": "flex",
-        "altText": "PayPay AI Morning Report",
+        "altText": "PayPay AI Market Report",
         "contents": {
             "type": "bubble",
             "body": {

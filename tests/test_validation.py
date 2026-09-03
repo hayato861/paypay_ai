@@ -31,6 +31,17 @@ from validation import (
 
 
 class ValidationTest(unittest.TestCase):
+    def test_report_copy_is_time_neutral_and_evening_scheduled(self):
+        paths = [
+            "README.md", "report.py", "line.py", "image.py", "web.py",
+            "index.html", "premium_web.py", "premium.html",
+        ]
+        combined = "\n".join(Path(path).read_text(encoding="utf-8") for path in paths)
+        for wording in ("Morning", "morning", "Night", "night", "毎朝", "毎晩"):
+            self.assertNotIn(wording, combined)
+        self.assertIn('cron: "30 11 * * 1-5"', Path(".github/workflows/paypay_ai.yml").read_text())
+        self.assertIn('cron: "40 11 * * 1-5"', Path(".github/workflows/premium_report.yml").read_text())
+
     def test_directional_accuracy(self):
         self.assertEqual(directional_accuracy([1, 0, 1], [1, 1, 1]), 2 / 3)
 

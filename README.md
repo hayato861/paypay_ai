@@ -1,7 +1,7 @@
 
-# PayPay AI Morning Report
+# PayPay AI Market Report
 
-毎朝マーケットを分析し、
+マーケットを定期的に分析し、
 PayPayポイント運用の判断を通知するPythonプロジェクト。
 
 ## 実装予定

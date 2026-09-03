@@ -2,7 +2,7 @@ name: PayPay AI
 
 on:
   schedule:
-    - cron: "10 0 * * 1-5"
+    - cron: "30 11 * * 1-5"
   workflow_dispatch:
 
 permissions:

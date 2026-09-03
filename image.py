@@ -64,7 +64,7 @@ def create_market_image(
 
     draw.text(
         (75, 120),
-        "Morning Market Report",
+        "Market Report",
         font=small_font,
         fill="#94a3b8"
     )

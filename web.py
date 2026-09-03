@@ -256,7 +256,7 @@ def create_page(
                 </h1>
                 
                 <div class="subtitle">
-                    毎朝 自動更新
+                    定期更新
                 </div>
                 
                 <div class="small">
@@ -477,7 +477,7 @@ def create_page(
             <h2>📈 市場スコアとは？</h2>
             <p>
                 <strong>市場スコア</strong>は、
-                PayPay AIが毎朝マーケットを分析して<br>
+                PayPay AIがマーケットを定期的に分析して<br>
                 算出する<strong>100点満点の独自評価</strong>です。
             </p>
 
@@ -513,7 +513,7 @@ def create_page(
             <p class="small">
 
                 ※ QQQ・S&P500・VIX・Fear & Greed指数などを<br>
-                もとにAIが毎朝判定しています。
+                もとにAIが判定しています。
 
             </p>
 
