@@ -65,4 +65,5 @@ date,score,recommend,qqq_change,result,evaluation_source
 2026-10-24,55,テクノロジーチャレンジ,3.91,Win,etf_v1
 2026-10-27,65,テクノロジーチャレンジ,3.70,Win,etf_v1
 2026-10-28,60,テクノロジーチャレンジ,0.41,Win,etf_v1
-2026-10-29,65,テクノロジーチャレンジ,,Pending,
+2026-10-29,65,テクノロジーチャレンジ,-4.58,Lose,etf_v1
+2026-10-30,45,逆チャレンジ,,Pending,
