@@ -85,5 +85,6 @@ date,score,recommend,qqq_change,result,evaluation_source
 2026-11-21,0,ゴールド,3.14,Win,etf_v1
 2026-11-24,55,ゴールド,-2.27,Lose,etf_v1
 2026-11-25,25,ゴールド,0.53,Win,etf_v1
-2026-11-26,25,ゴールド,,Pending,
-2026-11-27,25,ゴールド,,Pending,
+2026-11-26,25,ゴールド,2.12,Win,etf_v1
+2026-11-27,25,ゴールド,2.12,Win,etf_v1
+2026-11-28,65,テクノロジーチャレンジ,,Pending,
